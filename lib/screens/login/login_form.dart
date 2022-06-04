@@ -193,7 +193,7 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   void onLoginPress(BuildContext context) async {
-    debugPrint(phoneNo.toString());
+    debugPrint(phoneNo!.completeNumber);
     String loginResponse =
         await authRepository.login(phoneNo!.completeNumber, password!);
     if (loginResponse != "Success") {

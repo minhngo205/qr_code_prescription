@@ -21,8 +21,14 @@ class AuthenticationRepository {
 
   Future register(String phoneNo, String password, String fullname) async {
     debugPrint("register called");
-    final response = await http.post(Uri.parse(baseURL + "/register"),
-        body: {'username': phoneNo, 'password': password, 'name': fullname});
+    final response = await http.post(
+      Uri.parse(baseURL + "/register"),
+      body: {
+        'phone_number': phoneNo,
+        'password': password,
+        'name': fullname,
+      },
+    );
     var convertedDataToJson = jsonDecode(response.body);
 
     if (response.statusCode == 200) {
@@ -44,15 +50,20 @@ class AuthenticationRepository {
 
   Future login(String phoneNo, String password) async {
     debugPrint("login called");
-    final response = await http.post(Uri.parse(baseURL + "/login"),
-        body: {'username': phoneNo, 'password': password});
+    final response = await http.post(
+      Uri.parse(baseURL + "/token/"),
+      body: {
+        'phone_number': phoneNo,
+        'password': password,
+      },
+    );
     var convertedDataToJson = jsonDecode(response.body);
     var data = Map<String, dynamic>.from(convertedDataToJson);
     debugPrint(data.toString());
     if (data["detail"] != null) {
       return data["detail"];
     } else {
-      _storageRepository.saveToken(data["refresh_token"], data["access_token"]);
+      _storageRepository.saveToken(data["refresh"], data["access"]);
       debugPrint(
           "Refresh Token: " + _storageRepository.getRefreshToken().toString());
       debugPrint(

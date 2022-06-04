@@ -1,6 +1,8 @@
+import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
+import 'package:qr_code_prescription/components/fab_bottom_app_bar.dart';
 import 'package:qr_code_prescription/screens/main/home_screen.dart';
 import 'package:qr_code_prescription/screens/splash/splash_screen.dart';
 import 'package:qr_code_prescription/utils/size_config.dart';
@@ -16,62 +18,40 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
-  final PersistentTabController _controller =
-      PersistentTabController(initialIndex: 0);
-
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    return PersistentTabView(
-      context,
-      controller: _controller,
-      screens: _buildScreens(),
-      items: _navBarsItems(),
-      confineInSafeArea: true,
-      backgroundColor: Colors.white, // Default is Colors.white.
-      handleAndroidBackButtonPress: true, // Default is true.
-      resizeToAvoidBottomInset:
-          true, // This needs to be true if you want to move up the screen when keyboard appears. Default is true.
-      stateManagement: true, // Default is true.
-      hideNavigationBarWhenKeyboardShows:
-          true, // Recommended to set 'resizeToAvoidBottomInset' as true while using this argument. Default is true.
-      decoration: NavBarDecoration(
-        borderRadius: BorderRadius.circular(10.0),
-        colorBehindNavBar: Colors.white,
-        boxShadow: _boxShadow(),
+    bool keyboardIsOpen = MediaQuery.of(context).viewInsets.bottom != 0;
+    return Scaffold(
+      body: _buildScreens().elementAt(_selectedIndex),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: Visibility(
+        visible: !keyboardIsOpen,
+        child: FloatingActionButton(
+          child: const Icon(CupertinoIcons.qrcode_viewfinder),
+          onPressed: () {
+            Navigator.pushNamed(context, SplashPage.routeName);
+          },
+        ),
       ),
-      popAllScreensOnTapOfSelectedTab: true,
-      popActionScreens: PopActionScreensType.all,
-      itemAnimationProperties: const ItemAnimationProperties(
-        // Navigation Bar's items animation properties.
-        duration: Duration(milliseconds: 200),
-        curve: Curves.ease,
+      bottomNavigationBar: FABBottomAppBar(
+        items: _navBarsItems,
+        centerItemText: "",
+        backgroundColor: CupertinoColors.white,
+        color: CupertinoColors.inactiveGray,
+        selectedColor: CupertinoColors.activeBlue,
+        notchedShape: const CircularNotchedRectangle(),
+        onTabSelected: (index) => setState(() {
+          _selectedIndex = index;
+        }),
       ),
-      screenTransitionAnimation: const ScreenTransitionAnimation(
-        // Screen transition animation on change of selected tab.
-        animateTabTransition: true,
-        curve: Curves.decelerate,
-        duration: Duration(milliseconds: 200),
-      ),
-      onItemSelected: (value) => {
-        if (value == 2)
-          {
-            _controller.index = _selectedIndex,
-            Navigator.pushNamed(context, SplashPage.routeName)
-          }
-        else
-          setState(() {
-            _selectedIndex = value;
-          })
-      },
-      navBarStyle: NavBarStyle.style16,
     );
   }
 
   Widget getBody() {
     switch (_selectedIndex) {
       case 0:
-        return const HomeScreen();
+        return const HomeTab();
       case 1:
         return const Notification();
       case 3:
@@ -85,57 +65,31 @@ class _MainScreenState extends State<MainScreen> {
 
   List<Widget> _buildScreens() {
     return [
-      const HomeScreen(),
+      const HomeTab(),
       const Notification(),
-      getBody(),
       const Message(),
       const Profile(),
     ];
   }
 
-  List<PersistentBottomNavBarItem> _navBarsItems() {
-    return [
-      PersistentBottomNavBarItem(
-        icon: const Icon(CupertinoIcons.house_fill),
-        inactiveIcon: const Icon(CupertinoIcons.house),
-        title: ("Home"),
-        activeColorPrimary: CupertinoColors.activeBlue,
-        inactiveColorPrimary: CupertinoColors.systemGrey,
-      ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(CupertinoIcons.bell_fill),
-        inactiveIcon: const Icon(CupertinoIcons.bell),
-        title: ("Settings"),
-        activeColorPrimary: CupertinoColors.activeBlue,
-        inactiveColorPrimary: CupertinoColors.systemGrey,
-      ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(
-          CupertinoIcons.qrcode_viewfinder,
-          color: CupertinoColors.white,
-        ),
-        activeColorPrimary: CupertinoColors.activeBlue,
-      ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(CupertinoIcons.rectangle_3_offgrid_fill),
-        inactiveIcon: const Icon(CupertinoIcons.rectangle_3_offgrid),
-        title: ("Settings"),
-        activeColorPrimary: CupertinoColors.activeBlue,
-        inactiveColorPrimary: CupertinoColors.systemGrey,
-      ),
-      PersistentBottomNavBarItem(
-        icon: const Icon(CupertinoIcons.person_fill),
-        inactiveIcon: const Icon(CupertinoIcons.person),
-        title: ("Settings"),
-        activeColorPrimary: CupertinoColors.activeBlue,
-        inactiveColorPrimary: CupertinoColors.systemGrey,
-      ),
-    ];
-  }
-
-  List<BoxShadow> _boxShadow() {
-    return [const BoxShadow(color: CupertinoColors.activeGreen)];
-  }
+  final List<FABBottomAppBarItem> _navBarsItems = [
+    FABBottomAppBarItem(
+      iconData: CupertinoIcons.home,
+      text: 'Trang chủ',
+    ),
+    FABBottomAppBarItem(
+      iconData: CupertinoIcons.bell,
+      text: 'Thông báo',
+    ),
+    FABBottomAppBarItem(
+      iconData: CupertinoIcons.rectangle_3_offgrid,
+      text: 'Danh mục',
+    ),
+    FABBottomAppBarItem(
+      iconData: CupertinoIcons.person,
+      text: 'Cá nhân',
+    ),
+  ];
 }
 
 class Home extends StatelessWidget {
