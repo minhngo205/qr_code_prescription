@@ -1,8 +1,7 @@
-import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:qr_code_prescription/components/fab_bottom_app_bar.dart';
+import 'package:qr_code_prescription/screens/loading/loading_screen.dart';
 import 'package:qr_code_prescription/screens/main/home_screen.dart';
 import 'package:qr_code_prescription/screens/splash/splash_screen.dart';
 import 'package:qr_code_prescription/utils/size_config.dart';
@@ -124,6 +123,8 @@ class Message extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text("Message"));
+    return Loading(
+      haveText: false,
+    );
   }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qr_code_prescription/screens/prescription/prescription_screen.dart';
+import 'package:qr_code_prescription/screens/prescription/prescription_detail_screen.dart';
 
 class PresCard extends StatelessWidget {
   final int presId;
@@ -20,7 +20,7 @@ class PresCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, PrescriptionScreen.routeName);
+        Navigator.pushNamed(context, PrescriptionDetail.routeName);
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10),

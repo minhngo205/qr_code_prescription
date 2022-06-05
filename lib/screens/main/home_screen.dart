@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_prescription/components/prescrip_card.dart';
+import 'package:qr_code_prescription/screens/prescription/personal_list_prescription.dart';
 import 'package:qr_code_prescription/utils/constants.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -77,7 +78,9 @@ class _HomeTabState extends State<HomeTab> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushNamed(context, ListPresScreen.routeName);
+                  },
                 )
               ],
             ),
@@ -138,12 +141,12 @@ class _HomeTabState extends State<HomeTab> {
             const SizedBox(
               height: 20,
             ),
-            for (var doctor in doctors)
-              TopDoctorCard(
-                img: doctor['img'],
-                doctorName: doctor['doctorName'],
-                doctorTitle: doctor['doctorTitle'],
-              )
+            // for (var doctor in doctors)
+            //   TopDoctorCard(
+            //     img: doctor['img'],
+            //     doctorName: doctor['doctorName'],
+            //     doctorTitle: doctor['doctorTitle'],
+            //   )
           ],
         ),
       ),

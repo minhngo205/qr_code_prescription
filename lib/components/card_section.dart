@@ -28,7 +28,7 @@ class CardSection extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.only(right: 15.0),
         width: 240,
-        decoration: new BoxDecoration(
+        decoration: const BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(10.0)),
           shape: BoxShape.rectangle,
           color: Colors.white,
@@ -40,7 +40,7 @@ class CardSection extends StatelessWidget {
               child: ClipPath(
                 clipper: MyCustomClipper(clipType: ClipType.semiCircle),
                 child: Container(
-                  decoration: new BoxDecoration(
+                  decoration: const BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(10.0)),
                     color: kBlueLightColor,
                   ),
@@ -50,7 +50,7 @@ class CardSection extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(20.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
@@ -61,15 +61,15 @@ class CardSection extends StatelessWidget {
                         image: image,
                         width: 24,
                         height: 24,
-                        color: Theme.of(context).accentColor,
+                        color: Theme.of(context).colorScheme.secondary,
                       ),
                       Text(
                         time,
-                        style: TextStyle(fontSize: 15, color: kTextColor),
+                        style: const TextStyle(fontSize: 15, color: kTextColor),
                       ),
                     ],
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
@@ -80,29 +80,30 @@ class CardSection extends StatelessWidget {
                             Text(
                               title,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                   color: kTextColor),
                             ),
-                            SizedBox(height: 5),
+                            const SizedBox(height: 5),
                             Text(
                               '$value $unit',
-                              style: TextStyle(fontSize: 15, color: kTextColor),
+                              style: const TextStyle(
+                                  fontSize: 15, color: kTextColor),
                             ),
                           ],
                         ),
                       ),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       InkWell(
                         child: Container(
-                          decoration: new BoxDecoration(
+                          decoration: BoxDecoration(
                             borderRadius:
-                                BorderRadius.all(Radius.circular(10.0)),
+                                const BorderRadius.all(Radius.circular(10.0)),
                             shape: BoxShape.rectangle,
                             color: isDone
-                                ? Theme.of(context).accentColor
-                                : Color(0xFFF0F4F8),
+                                ? Theme.of(context).colorScheme.secondary
+                                : const Color(0xFFF0F4F8),
                           ),
                           width: 44,
                           height: 44,
@@ -111,7 +112,7 @@ class CardSection extends StatelessWidget {
                               Icons.check,
                               color: isDone
                                   ? Colors.white
-                                  : Theme.of(context).accentColor,
+                                  : Theme.of(context).colorScheme.secondary,
                             ),
                           ),
                         ),

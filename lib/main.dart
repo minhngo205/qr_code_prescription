@@ -48,39 +48,13 @@ class _QRCodeAppState extends State<QRCodeApp> {
   @override
   Widget build(BuildContext context) {
     return isLoading
-        ? Loading()
+        ? Loading(haveText: false)
         : MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'QR Code Prescription',
             theme: theme(),
             routes: routes,
             initialRoute: _initRoute,
-            // home: _initRoute == MainScreen.routeName ? MainScreen() : LoginScreen(),
           );
   }
 }
-
-// class MyApp extends StatelessWidget {
-//   const MyApp({Key? key}) : super(key: key);
-
-//   // This widget is the root of your application.
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       debugShowCheckedModeBanner: false,
-//       title: 'QR Code Prescription',
-//       theme: theme(),
-//       routes: routes,
-//       initialRoute:
-//           getInitRoute() != null ? MainScreen.routeName : LoginScreen.routeName,
-//     );
-//   }
-
-//   String? getInitRoute() {
-//     StorageRepository storageRepository = StorageRepository();
-//     storageRepository.getRefreshToken().then((value) {
-//       debugPrint(value);
-//       return value;
-//     });
-//   }
-// }
