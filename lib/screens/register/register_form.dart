@@ -1,12 +1,17 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl_phone_field/country_picker_dialog.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
 import 'package:qr_code_prescription/components/custom_surfix_icon.dart';
 import 'package:qr_code_prescription/components/default_button.dart';
 import 'package:qr_code_prescription/components/form_error.dart';
+import 'package:qr_code_prescription/services/authentication/authentication_service.dart';
 import 'package:qr_code_prescription/utils/constants.dart';
 import 'package:qr_code_prescription/utils/size_config.dart';
 import 'package:qr_code_prescription/utils/theme/light_color.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class RegisterForm extends StatefulWidget {
   const RegisterForm({Key? key}) : super(key: key);
@@ -17,6 +22,7 @@ class RegisterForm extends StatefulWidget {
 
 class _RegisterFormState extends State<RegisterForm> {
   final _formKey = GlobalKey<FormState>();
+  late final AuthenticationRepository authRepository;
   PhoneNumber? phoneNo;
   String? fullName;
   String? password;
@@ -24,10 +30,18 @@ class _RegisterFormState extends State<RegisterForm> {
   final List<String?> errors = [];
 
   OutlineInputBorder outlineInputBorder = OutlineInputBorder(
-    borderRadius: BorderRadius.circular(20),
-    borderSide: const BorderSide(color: kTextColor),
+    borderRadius: BorderRadius.circular(12),
+    borderSide: const BorderSide(color: CupertinoColors.white),
     gapPadding: 10,
   );
+
+  OutlineInputBorder outlineInputBorderFocus = OutlineInputBorder(
+    borderRadius: BorderRadius.circular(12),
+    borderSide: const BorderSide(color: CupertinoColors.activeBlue),
+    gapPadding: 10,
+  );
+
+  bool _isObscure = false;
 
   void addError({String? error}) {
     if (!errors.contains(error)) {
@@ -46,6 +60,12 @@ class _RegisterFormState extends State<RegisterForm> {
   }
 
   @override
+  void initState() {
+    authRepository = AuthenticationRepository();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
@@ -57,7 +77,8 @@ class _RegisterFormState extends State<RegisterForm> {
           SizedBox(height: getProportionateScreenHeight(30)),
           buildPasswordFormField(),
           SizedBox(height: getProportionateScreenHeight(30)),
-          buildConfirmPassFormField(),
+          // buildConfirmPassFormField(),
+          // SizedBox(height: getProportionateScreenHeight(30)),
           FormError(errors: errors),
           SizedBox(height: getProportionateScreenHeight(40)),
           DefaultButton(
@@ -66,10 +87,10 @@ class _RegisterFormState extends State<RegisterForm> {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
                 // if all are valid then go to success screen
-                // Navigator.pushNamed(context, CompleteProfileScreen.routeName);
+                onRegisterPress(context);
               }
             },
-            backgroundColor: LightColor.lightBlue,
+            backgroundColor: CupertinoColors.activeBlue,
             textColor: Colors.white,
           ),
         ],
@@ -117,118 +138,162 @@ class _RegisterFormState extends State<RegisterForm> {
     );
   }
 
-  TextFormField buildPasswordFormField() {
-    return TextFormField(
-      obscureText: true,
-      onSaved: (newValue) => password = newValue,
-      onChanged: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kPassNullError);
-        } else if (value.length >= 8) {
-          removeError(error: kShortPassError);
-        }
-        return;
-      },
-      validator: (value) {
-        if (value!.isEmpty) {
-          addError(error: kPassNullError);
-        } /* else if (value.length < 8) {
-            addError(error: kShortPassError);
-            return "";
-          } */
-        return null;
-      },
-      decoration: InputDecoration(
-        labelText: "Mật khẩu",
-        hintText: "Nhập mật khẩu của bạn",
-        suffixIcon: const CustomSurffixIcon(svgIcon: "assets/icons/Lock.svg"),
-
-        // If  you are using latest version of flutter then lable text and hint text shown like this
-        // if you r using flutter less then 1.20.* then maybe this is not working properly
-
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 42, vertical: 20),
-        enabledBorder: outlineInputBorder,
-        focusedBorder: outlineInputBorder,
-        border: outlineInputBorder,
-        fillColor: kSecondaryColor,
+  Widget buildPasswordFormField() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+      child: TextFormField(
+        // controller: TextEditingController(text: password!),
+        obscureText: _isObscure,
+        onSaved: (newValue) => password = newValue,
+        onChanged: (value) {
+          if (value.isNotEmpty) {
+            removeError(error: kPassNullError);
+          } else if (value.length >= 8) {
+            removeError(error: kShortPassError);
+          }
+          return;
+        },
+        validator: (value) {
+          if (value!.isEmpty) {
+            addError(error: kPassNullError);
+          } /* else if (value.length < 8) {
+              addError(error: kShortPassError);
+              return "";
+            } */
+          return null;
+        },
+        decoration: InputDecoration(
+          hintText: "Mật khẩu",
+          suffixIcon: IconButton(
+            onPressed: () {
+              setState(() {
+                _isObscure = !_isObscure;
+              });
+            },
+            icon: _isObscure
+                ? const Icon(CupertinoIcons.eye)
+                : const Icon(CupertinoIcons.eye_slash_fill),
+          ),
+          enabledBorder: outlineInputBorder,
+          focusedBorder: outlineInputBorderFocus,
+          errorBorder: outlineInputBorderFocus,
+          fillColor: Colors.grey[200],
+          filled: true,
+        ),
+        style: const TextStyle(fontSize: 18.0),
       ),
-      style: const TextStyle(fontSize: 18.0),
     );
   }
 
-  IntlPhoneField buildPhoneNoFormField() {
-    return IntlPhoneField(
-      onSaved: (newValue) => phoneNo = newValue,
-      keyboardType: TextInputType.phone,
-      onChanged: (value) {
-        if (value.number.isNotEmpty) {
-          removeError(error: kPhoneNoNullError);
-        } else if (phoneNoValidatorRegExp.hasMatch(value.completeNumber)) {
-          debugPrint("Valid");
-          removeError(error: kInvalidPhoneNoError);
-        }
-        return;
-      },
-      validator: (value) {
-        if (value!.number.isEmpty) {
-          addError(error: kPhoneNoNullError);
-        } else if (!phoneNoValidatorRegExp.hasMatch(value.completeNumber)) {
-          addError(error: kInvalidPhoneNoError);
-        }
-        return null;
-      },
-      decoration: InputDecoration(
-        labelText: "Số điện thoại",
-        hintText: "Nhập số điện thoại của bạn",
-        suffixIcon: const CustomSurffixIcon(svgIcon: "assets/icons/Call.svg"),
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 42, vertical: 20),
-        enabledBorder: outlineInputBorder,
-        focusedBorder: outlineInputBorder,
-        border: outlineInputBorder,
-        fillColor: kSecondaryColor,
+  Widget buildPhoneNoFormField() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+      child: IntlPhoneField(
+        disableLengthCheck: true,
+        pickerDialogStyle: PickerDialogStyle(
+          searchFieldInputDecoration: InputDecoration(
+            hintText: "Chọn quốc gia",
+            enabledBorder: outlineInputBorder,
+            focusedBorder: outlineInputBorderFocus,
+            fillColor: Colors.grey[200],
+            filled: true,
+          ),
+        ),
+        // controller: TextEditingController(text: phoneNo!.number),
+        onSaved: (newValue) => phoneNo = newValue,
+        keyboardType: TextInputType.phone,
+        onChanged: (value) {
+          if (value.number.isNotEmpty) {
+            removeError(error: kPhoneNoNullError);
+          } else if (phoneNoValidatorRegExp.hasMatch(value.completeNumber)) {
+            debugPrint("Valid");
+            removeError(error: kInvalidPhoneNoError);
+          }
+          return;
+        },
+        validator: (value) {
+          if (value!.number.isEmpty) {
+            addError(error: kPhoneNoNullError);
+          } else if (!phoneNoValidatorRegExp.hasMatch(value.completeNumber)) {
+            addError(error: kInvalidPhoneNoError);
+          }
+          return null;
+        },
+        decoration: InputDecoration(
+          hintText: "Số điện thoại",
+          suffixIcon: const Icon(CupertinoIcons.phone),
+          enabledBorder: outlineInputBorder,
+          focusedBorder: outlineInputBorderFocus,
+          errorBorder: outlineInputBorderFocus,
+          fillColor: Colors.grey[200],
+          filled: true,
+        ),
+        initialCountryCode: "VN",
+        style: const TextStyle(fontSize: 18.0),
       ),
-      initialCountryCode: "VN",
-      style: const TextStyle(fontSize: 18.0),
     );
   }
 
-  TextFormField buildFullNameFormField() {
-    return TextFormField(
-      onSaved: (newValue) => fullName = newValue,
-      keyboardType: TextInputType.name,
-      onChanged: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kFullNameNullError);
-        } else if (vnNameRegExp.hasMatch(value)) {
-          removeError(error: kInvalidFullName);
-        }
-        return;
-      },
-      validator: (value) {
-        if (value!.isEmpty) {
-          addError(error: kNameNullError);
-        } else if (!vnNameRegExp.hasMatch(value)) {
-          addError(error: kInvalidFullName);
-        }
-        return null;
-      },
-      decoration: InputDecoration(
-        labelText: "Họ và tên",
-        hintText: "Nhập họ và tên của bạn",
-        suffixIcon: const CustomSurffixIcon(svgIcon: "assets/icons/User.svg"),
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 42, vertical: 20),
-        enabledBorder: outlineInputBorder,
-        focusedBorder: outlineInputBorder,
-        border: outlineInputBorder,
-        fillColor: kSecondaryColor,
+  Widget buildFullNameFormField() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+      child: TextFormField(
+        onSaved: (newValue) => fullName = newValue,
+        keyboardType: TextInputType.name,
+        onChanged: (value) {
+          if (value.isNotEmpty) {
+            removeError(error: kFullNameNullError);
+          } else if (vnNameRegExp.hasMatch(value)) {
+            removeError(error: kInvalidFullName);
+          }
+          return;
+        },
+        validator: (value) {
+          if (value!.isEmpty) {
+            // addError(error: kNameNullError);
+          } else if (!vnNameRegExp.hasMatch(value)) {
+            // addError(error: kInvalidFullName);
+          }
+          return null;
+        },
+        decoration: InputDecoration(
+          hintText: "Nhập họ và tên của bạn",
+          suffixIcon: const Icon(CupertinoIcons.person),
+          enabledBorder: outlineInputBorder,
+          focusedBorder: outlineInputBorderFocus,
+          fillColor: Colors.grey[200],
+          filled: true,
+        ),
+        style: const TextStyle(fontSize: 18.0),
       ),
-      style: const TextStyle(fontSize: 18.0),
     );
+  }
+
+  void onRegisterPress(BuildContext context) async {
+    String registerResponse = await authRepository.register(
+      phoneNo!.completeNumber,
+      password!,
+      fullName!,
+    );
+    if (registerResponse != "Success") {
+      showTopSnackBar(
+        context,
+        CustomSnackBar.error(message: registerResponse),
+      );
+    } else {
+      clearError();
+      showTopSnackBar(
+        context,
+        const CustomSnackBar.success(
+            message: "Đã đăng ký thành công\nQuay trở lại trang đăng nhập"),
+      );
+      Navigator.pop(context);
+    }
+  }
+
+  void clearError() {
+    setState(() {
+      errors.clear();
+    });
   }
 }

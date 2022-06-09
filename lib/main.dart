@@ -19,24 +19,23 @@ class QRCodeApp extends StatefulWidget {
 }
 
 class _QRCodeAppState extends State<QRCodeApp> {
-  String? _initRoute;
+  String _initRoute = LoginScreen.routeName;
   bool isLoading = true;
 
-  getInitRoute() {
+  getInitRoute() async {
     StorageRepository storageRepository = StorageRepository();
-    storageRepository.getRefreshToken().then((value) {
-      if (value != null) {
-        setState(() {
-          _initRoute = MainScreen.routeName;
-          isLoading = false;
-        });
-      } else {
-        setState(() {
-          _initRoute = LoginScreen.routeName;
-          isLoading = false;
-        });
-      }
-    });
+    String? refreshToken = await storageRepository.getRefreshToken();
+    if (refreshToken == null) {
+      setState(() {
+        _initRoute = LoginScreen.routeName;
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        _initRoute = MainScreen.routeName;
+        isLoading = false;
+      });
+    }
   }
 
   @override

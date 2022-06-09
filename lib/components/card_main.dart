@@ -74,7 +74,7 @@ class CardMain extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        value,
+                        value.isNotEmpty ? value : "--",
                         style: const TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.w900,

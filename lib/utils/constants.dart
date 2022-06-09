@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'size_config.dart';
 
 const baseURL = "https://yshuynh.pythonanywhere.com/api";
@@ -37,9 +38,9 @@ final RegExp vnNameRegExp = RegExp(
 
 const String kPhoneNoNullError = "Please Enter your phone number";
 const String kInvalidPhoneNoError = "Please Enter Valid phone number";
-const String kPassNullError = "Please Enter your password";
+const String kPassNullError = "Hãy nhập mật khẩu của bạn";
 const String kShortPassError = "Password is too short";
-const String kMatchPassError = "Passwords don't match";
+const String kMatchPassError = "Mật khẩu xác nhận không trùng khớp";
 const String kNameNullError = "Please Enter your name";
 const String kPhoneNumberNullError = "Please Enter your phone number";
 const String kAddressNullError = "Please Enter your address";
@@ -86,3 +87,26 @@ TextStyle kFilterStyle = TextStyle(
   color: Color(MyColors.bg02),
   fontWeight: FontWeight.w500,
 );
+
+String dateformater(DateTime data) {
+  final DateFormat formatter = DateFormat('dd/MM/yyyy');
+  final String formatted = formatter.format(data);
+  return formatted;
+}
+
+calculateAge(DateTime birthDate) {
+  DateTime currentDate = DateTime.now();
+  int age = currentDate.year - birthDate.year;
+  int month1 = currentDate.month;
+  int month2 = birthDate.month;
+  if (month2 > month1) {
+    age--;
+  } else if (month1 == month2) {
+    int day1 = currentDate.day;
+    int day2 = birthDate.day;
+    if (day2 > day1) {
+      age--;
+    }
+  }
+  return age;
+}

@@ -19,9 +19,9 @@ class Body extends StatelessWidget {
             child: Column(
               children: [
                 SizedBox(height: SizeConfig.screenHeight * 0.04), // 4%
-                Text("Register Account", style: headingStyle),
+                Text("Đăng ký", style: headingStyle),
                 const Text(
-                  "Complete your details or continue \nwith social media",
+                  "Đăng ký tài khoản\nđể sử dụng hệ thống",
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: SizeConfig.screenHeight * 0.08),
@@ -46,7 +46,7 @@ class Body extends StatelessWidget {
                 ),
                 SizedBox(height: getProportionateScreenHeight(20)),
                 Text(
-                  'By continuing your confirm that you agree \nwith our Term and Condition',
+                  'Với việc tiếp tục, bạn đã đồng ý với tiêu chuẩn cộng đồng và chính sách bảo mật của chúng tôi',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.caption,
                 )

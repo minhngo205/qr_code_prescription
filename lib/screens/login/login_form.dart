@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl_phone_field/country_picker_dialog.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
 import 'package:qr_code_prescription/components/custom_surfix_icon.dart';
@@ -27,10 +29,17 @@ class _LoginFormState extends State<LoginForm> {
   String? password;
   bool? remember = false;
   final List<String?> errors = [];
+  bool _isObscure = true;
 
   OutlineInputBorder outlineInputBorder = OutlineInputBorder(
-    borderRadius: BorderRadius.circular(20),
-    borderSide: const BorderSide(color: kTextColor),
+    borderRadius: BorderRadius.circular(12),
+    borderSide: const BorderSide(color: CupertinoColors.white),
+    gapPadding: 10,
+  );
+
+  OutlineInputBorder outlineInputBorderFocus = OutlineInputBorder(
+    borderRadius: BorderRadius.circular(12),
+    borderSide: const BorderSide(color: CupertinoColors.activeBlue),
     gapPadding: 10,
   );
 
@@ -107,7 +116,7 @@ class _LoginFormState extends State<LoginForm> {
                 // Navigator.pushNamed(context, LoginSuccessScreen.routeName);
               }
             },
-            backgroundColor: LightColor.lightBlue,
+            backgroundColor: CupertinoColors.activeBlue,
             textColor: Colors.white,
           ),
         ],
@@ -115,80 +124,99 @@ class _LoginFormState extends State<LoginForm> {
     );
   }
 
-  IntlPhoneField buildPhoneNoFormField() {
-    return IntlPhoneField(
-      onSaved: (newValue) => phoneNo = newValue,
-      keyboardType: TextInputType.phone,
-      onChanged: (value) {
-        if (value.number.isNotEmpty) {
-          removeError(error: kPhoneNoNullError);
-        } else if (phoneNoValidatorRegExp.hasMatch(value.completeNumber)) {
-          debugPrint("Valid");
-          removeError(error: kInvalidPhoneNoError);
-        }
-        return;
-      },
-      validator: (value) {
-        if (value!.number.isEmpty) {
-          addError(error: kPhoneNoNullError);
-        } else if (!phoneNoValidatorRegExp.hasMatch(value.completeNumber)) {
-          addError(error: kInvalidPhoneNoError);
-        }
-        return null;
-      },
-      decoration: InputDecoration(
-        labelText: "Số điện thoại",
-        hintText: "Nhập số điện thoại của bạn",
-        suffixIcon: const CustomSurffixIcon(svgIcon: "assets/icons/Call.svg"),
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 42, vertical: 20),
-        enabledBorder: outlineInputBorder,
-        focusedBorder: outlineInputBorder,
-        border: outlineInputBorder,
-        fillColor: kSecondaryColor,
+  Widget buildPhoneNoFormField() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+      child: IntlPhoneField(
+        disableLengthCheck: true,
+        pickerDialogStyle: PickerDialogStyle(
+          searchFieldInputDecoration: InputDecoration(
+            hintText: "Chọn quốc gia",
+            enabledBorder: outlineInputBorder,
+            focusedBorder: outlineInputBorderFocus,
+            fillColor: Colors.grey[200],
+            filled: true,
+          ),
+        ),
+        // controller: TextEditingController(text: phoneNo!.number),
+        onSaved: (newValue) => phoneNo = newValue,
+        keyboardType: TextInputType.phone,
+        onChanged: (value) {
+          if (value.number.isNotEmpty) {
+            removeError(error: kPhoneNoNullError);
+          } else if (phoneNoValidatorRegExp.hasMatch(value.completeNumber)) {
+            debugPrint("Valid");
+            removeError(error: kInvalidPhoneNoError);
+          }
+          return;
+        },
+        validator: (value) {
+          if (value!.number.isEmpty) {
+            addError(error: kPhoneNoNullError);
+          } else if (!phoneNoValidatorRegExp.hasMatch(value.completeNumber)) {
+            addError(error: kInvalidPhoneNoError);
+          }
+          return null;
+        },
+        decoration: InputDecoration(
+          hintText: "Số điện thoại",
+          suffixIcon: const Icon(CupertinoIcons.phone),
+          enabledBorder: outlineInputBorder,
+          focusedBorder: outlineInputBorderFocus,
+          errorBorder: outlineInputBorderFocus,
+          fillColor: Colors.grey[200],
+          filled: true,
+        ),
+        initialCountryCode: "VN",
+        style: const TextStyle(fontSize: 18.0),
       ),
-      initialCountryCode: "VN",
-      style: const TextStyle(fontSize: 18.0),
     );
   }
 
-  TextFormField buildPasswordFormField() {
-    return TextFormField(
-      obscureText: true,
-      onSaved: (newValue) => password = newValue,
-      onChanged: (value) {
-        if (value.isNotEmpty) {
-          removeError(error: kPassNullError);
-        } else if (value.length >= 8) {
-          removeError(error: kShortPassError);
-        }
-        return;
-      },
-      validator: (value) {
-        if (value!.isEmpty) {
-          addError(error: kPassNullError);
-        } /* else if (value.length < 8) {
-            addError(error: kShortPassError);
-            return "";
-          } */
-        return null;
-      },
-      decoration: InputDecoration(
-        labelText: "Mật khẩu",
-        hintText: "Nhập mật khẩu của bạn",
-        suffixIcon: const CustomSurffixIcon(svgIcon: "assets/icons/Lock.svg"),
-        // If  you are using latest version of flutter then lable text and hint text shown like this
-        // if you r using flutter less then 1.20.* then maybe this is not working properly
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 42, vertical: 20),
-        enabledBorder: outlineInputBorder,
-        focusedBorder: outlineInputBorder,
-        border: outlineInputBorder,
-        fillColor: kSecondaryColor,
+  Widget buildPasswordFormField() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+      child: TextFormField(
+        // controller: TextEditingController(text: password!),
+        obscureText: _isObscure,
+        onSaved: (newValue) => password = newValue,
+        onChanged: (value) {
+          if (value.isNotEmpty) {
+            removeError(error: kPassNullError);
+          } else if (value.length >= 8) {
+            removeError(error: kShortPassError);
+          }
+          return;
+        },
+        validator: (value) {
+          if (value!.isEmpty) {
+            addError(error: kPassNullError);
+          } /* else if (value.length < 8) {
+              addError(error: kShortPassError);
+              return "";
+            } */
+          return null;
+        },
+        decoration: InputDecoration(
+          hintText: "Mật khẩu",
+          suffixIcon: IconButton(
+            onPressed: () {
+              setState(() {
+                _isObscure = !_isObscure;
+              });
+            },
+            icon: _isObscure
+                ? const Icon(CupertinoIcons.eye)
+                : const Icon(CupertinoIcons.eye_slash_fill),
+          ),
+          enabledBorder: outlineInputBorder,
+          focusedBorder: outlineInputBorderFocus,
+          errorBorder: outlineInputBorderFocus,
+          fillColor: Colors.grey[200],
+          filled: true,
+        ),
+        style: const TextStyle(fontSize: 18.0),
       ),
-      style: const TextStyle(fontSize: 18.0),
     );
   }
 

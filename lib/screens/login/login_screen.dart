@@ -10,9 +10,7 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Sign In"),
-      ),
+      backgroundColor: Colors.grey[300],
       body: const Body(),
     );
   }
