@@ -1,15 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:qr_code_prescription/components/prescrip_card.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:qr_code_prescription/screens/main/home_screen/recent_pres.dart';
 import 'package:qr_code_prescription/screens/main/home_screen/welcome_card.dart';
-import 'package:qr_code_prescription/screens/medical_info/medical_info.dart';
-import 'package:qr_code_prescription/screens/prescription/personal_list_prescription.dart';
+import 'package:qr_code_prescription/screens/list_screen/list_screen.dart';
+import 'package:qr_code_prescription/screens/medical_info/user_info.dart';
 import 'package:qr_code_prescription/services/dtos/user_info.dart';
-// import 'package:qr_code_prescription/services/authentication/dtos/user_info.dart';
-import 'package:qr_code_prescription/services/storage/storage_service.dart';
 import 'package:qr_code_prescription/utils/constants.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../../services/dtos/prescription.dart';
 
@@ -57,231 +54,211 @@ class _HomeTabState extends State<HomeTab> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 30),
-        child: ListView(
-          children: [
-            const SizedBox(
-              height: 20,
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: CupertinoColors.white,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.menu,
+            color: CupertinoColors.activeBlue,
+          ),
+          onPressed: () {},
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(
+              CupertinoIcons.search,
+              color: CupertinoColors.activeBlue,
             ),
-            UserIntro(
-              userInfo: widget.userInfo,
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            const SearchInput(),
-            const SizedBox(
-              height: 20,
-            ),
-            const CategoryIcons(),
-            const SizedBox(
-              height: 20,
-            ),
-            // RecentPres(),
-            widget.listPres.isEmpty
-                ? const WelcomeCard()
-                : RecentPres(
-                    listPres: widget.listPres,
-                  ),
-            const SizedBox(
-              height: 20,
-            ),
-            Text(
-              'Chức năng',
-              style: TextStyle(
-                color: Color(MyColors.header01),
-                fontWeight: FontWeight.bold,
+          ),
+        ],
+      ),
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 30),
+          child: ListView(
+            children: [
+              const SizedBox(
+                height: 20,
               ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            // for (var doctor in doctors)
-            //   TopDoctorCard(
-            //     img: doctor['img'],
-            //     doctorName: doctor['doctorName'],
-            //     doctorTitle: doctor['doctorTitle'],
-            //   )
-          ],
+              UserIntro(
+                userInfo: widget.userInfo,
+              ),
+              const SizedBox(height: 30),
+              Text(
+                'Phòng chống dịch covid-19',
+                style: TextStyle(
+                  color: Color(MyColors.header01),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 20),
+              // const SearchInput(),
+              buildPreventation(),
+              const SizedBox(height: 20),
+              buildHelpCard(context),
+              const SizedBox(height: 20),
+              Text(
+                'Danh mục',
+                style: TextStyle(
+                  color: Color(MyColors.header01),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              const CategoryIcons(),
+              const SizedBox(height: 20),
+              // RecentPres(),
+              widget.listPres.isEmpty
+                  ? const WelcomeCard()
+                  : RecentPres(
+                      listPres: widget.listPres,
+                    ),
+              const SizedBox(
+                height: 20,
+              ),
+              // Text(
+              //   'Chức năng',
+              //   style: TextStyle(
+              //     color: Color(MyColors.header01),
+              //     fontWeight: FontWeight.bold,
+              //   ),
+              // ),
+              const SizedBox(
+                height: 20,
+              ),
+              // for (var doctor in doctors)
+              //   TopDoctorCard(
+              //     img: doctor['img'],
+              //     doctorName: doctor['doctorName'],
+              //     doctorTitle: doctor['doctorTitle'],
+              //   )
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class TopDoctorCard extends StatelessWidget {
-  String img;
-  String doctorName;
-  String doctorTitle;
-
-  TopDoctorCard({
-    Key? key,
-    required this.img,
-    required this.doctorName,
-    required this.doctorTitle,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 20),
-      child: InkWell(
-        onTap: () {
-          Navigator.pushNamed(context, "/pres");
-        },
-        child: Row(
-          children: [
-            Container(
-              color: Color(MyColors.grey01),
-              child: Image(
-                width: 100,
-                image: AssetImage(img),
-              ),
-            ),
-            const SizedBox(
-              width: 10,
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  doctorName,
-                  style: TextStyle(
-                    color: Color(MyColors.header01),
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
-                Text(
-                  doctorTitle,
-                  style: TextStyle(
-                    color: Color(MyColors.grey02),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.star,
-                      color: Color(MyColors.yellow02),
-                      size: 18,
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Text(
-                      '4.0 - 50 Reviews',
-                      style: TextStyle(color: Color(MyColors.grey02)),
-                    )
-                  ],
-                )
-              ],
-            )
-          ],
-        ),
+Row buildPreventation() {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: const <Widget>[
+      CovidPreventCard(
+        assetPath: "assets/images/medical-mask.png",
+        title: "Khẩu\ntrang",
       ),
-    );
-  }
+      CovidPreventCard(
+        assetPath: "assets/images/disinfectant.png",
+        title: "Khử\nkhuẩn",
+      ),
+      CovidPreventCard(
+        assetPath: "assets/images/social-distancing.png",
+        title: "Khoảng\ncách",
+      ),
+      CovidPreventCard(
+        assetPath: "assets/images/no-crowd.png",
+        title: "Không\ntụ tập",
+      ),
+      CovidPreventCard(
+        assetPath: "assets/images/screening.png",
+        title: "Khai báo\ny tế",
+      ),
+    ],
+  );
 }
 
-class AppointmentCard extends StatelessWidget {
-  final void Function() onTap;
-
-  const AppointmentCard({
+class CovidPreventCard extends StatelessWidget {
+  final String assetPath;
+  final String title;
+  const CovidPreventCard({
     Key? key,
-    required this.onTap,
+    required this.assetPath,
+    required this.title,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
-        Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: Color(MyColors.primary),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: onTap,
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        const CircleAvatar(
-                          backgroundImage: AssetImage('assets/doctor01.jpeg'),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text('Dr.Muhammed Syahid',
-                                style: TextStyle(color: Colors.white)),
-                            const SizedBox(
-                              height: 2,
-                            ),
-                            Text(
-                              'Dental Specialist',
-                              style: TextStyle(color: Color(MyColors.text01)),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    const ScheduleCard(),
-                  ],
-                ),
-              ),
-            ),
-          ),
+      children: <Widget>[
+        Image.asset(
+          assetPath,
+          height: 50,
+          width: 50,
         ),
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 20),
-          width: double.infinity,
-          height: 10,
-          decoration: BoxDecoration(
-            color: Color(MyColors.bg02),
-            borderRadius: const BorderRadius.only(
-              bottomRight: Radius.circular(10),
-              bottomLeft: Radius.circular(10),
-            ),
+        Text(
+          title,
+          style: const TextStyle(
+            color: kTextColor,
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
           ),
-        ),
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 40),
-          width: double.infinity,
-          height: 10,
-          decoration: BoxDecoration(
-            color: Color(MyColors.bg03),
-            borderRadius: const BorderRadius.only(
-              bottomRight: Radius.circular(10),
-              bottomLeft: Radius.circular(10),
-            ),
-          ),
-        ),
+          textAlign: TextAlign.center,
+        )
       ],
     );
   }
+}
+
+Widget buildHelpCard(BuildContext context) {
+  return SizedBox(
+    height: 150,
+    width: double.infinity,
+    child: Stack(
+      alignment: Alignment.bottomLeft,
+      children: <Widget>[
+        Container(
+          padding: EdgeInsets.only(
+            // left side padding is 40% of total width
+            left: MediaQuery.of(context).size.width * .4,
+            top: 20,
+            right: 20,
+          ),
+          height: 130,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [
+                Color(0xFF60BE93),
+                Color(0xFF1B8D59),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: RichText(
+            text: TextSpan(
+              children: [
+                const TextSpan(
+                  text: "Liên hệ ngay\nCơ sở y tế gần nhất\n",
+                  style: TextStyle(color: Colors.white, fontSize: 18),
+                ),
+                TextSpan(
+                  text: "Nếu có kết quả dương tính",
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.7),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: SvgPicture.asset("assets/images/nurse.svg"),
+        ),
+        Positioned(
+          top: 30,
+          right: 10,
+          child: SvgPicture.asset("assets/images/virus.svg"),
+        ),
+      ],
+    ),
+  );
 }
 
 List<Map> categories = [
@@ -312,58 +289,6 @@ class CategoryIcons extends StatelessWidget {
   }
 }
 
-class ScheduleCard extends StatelessWidget {
-  const ScheduleCard({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Color(MyColors.bg01),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: const [
-          Icon(
-            Icons.calendar_today,
-            color: Colors.white,
-            size: 15,
-          ),
-          SizedBox(
-            width: 5,
-          ),
-          Text(
-            'Mon, July 29',
-            style: TextStyle(color: Colors.white),
-          ),
-          SizedBox(
-            width: 20,
-          ),
-          Icon(
-            Icons.access_alarm,
-            color: Colors.white,
-            size: 17,
-          ),
-          SizedBox(
-            width: 5,
-          ),
-          Flexible(
-            child: Text(
-              '11:00 ~ 12:10',
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class CategoryIcon extends StatelessWidget {
   final IconData icon;
   final String text;
@@ -383,10 +308,28 @@ class CategoryIcon extends StatelessWidget {
       onTap: () {
         switch (index) {
           case 0:
-            Navigator.pushNamed(context, PersonalScreen.routeName);
+            Navigator.pushNamed(context, UserInfoPage.routeName);
+            break;
+          case 1:
+            Navigator.pushNamed(
+              context,
+              ListScreen.routeName,
+              arguments: ListScreenArguments("hospitals"),
+            );
+            break;
+          case 2:
+            Navigator.pushNamed(
+              context,
+              ListScreen.routeName,
+              arguments: ListScreenArguments("drugstores"),
+            );
             break;
           case 3:
-            Navigator.pushNamed(context, ListPresScreen.routeName);
+            Navigator.pushNamed(
+              context,
+              ListScreen.routeName,
+              arguments: ListScreenArguments("prescription"),
+            );
             break;
           default:
         }
@@ -502,3 +445,146 @@ class UserIntro extends StatelessWidget {
     );
   }
 }
+
+
+// class AppointmentCard extends StatelessWidget {
+//   final void Function() onTap;
+
+//   const AppointmentCard({
+//     Key? key,
+//     required this.onTap,
+//   }) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Column(
+//       children: [
+//         Container(
+//           width: double.infinity,
+//           decoration: BoxDecoration(
+//             color: Color(MyColors.primary),
+//             borderRadius: BorderRadius.circular(10),
+//           ),
+//           child: Material(
+//             color: Colors.transparent,
+//             child: InkWell(
+//               onTap: onTap,
+//               child: Padding(
+//                 padding: const EdgeInsets.all(20),
+//                 child: Column(
+//                   children: [
+//                     Row(
+//                       children: [
+//                         const CircleAvatar(
+//                           backgroundImage: AssetImage('assets/doctor01.jpeg'),
+//                         ),
+//                         const SizedBox(
+//                           width: 10,
+//                         ),
+//                         Column(
+//                           mainAxisAlignment: MainAxisAlignment.center,
+//                           crossAxisAlignment: CrossAxisAlignment.start,
+//                           children: [
+//                             const Text('Dr.Muhammed Syahid',
+//                                 style: TextStyle(color: Colors.white)),
+//                             const SizedBox(
+//                               height: 2,
+//                             ),
+//                             Text(
+//                               'Dental Specialist',
+//                               style: TextStyle(color: Color(MyColors.text01)),
+//                             ),
+//                           ],
+//                         ),
+//                       ],
+//                     ),
+//                     const SizedBox(
+//                       height: 20,
+//                     ),
+//                     const ScheduleCard(),
+//                   ],
+//                 ),
+//               ),
+//             ),
+//           ),
+//         ),
+//         Container(
+//           margin: const EdgeInsets.symmetric(horizontal: 20),
+//           width: double.infinity,
+//           height: 10,
+//           decoration: BoxDecoration(
+//             color: Color(MyColors.bg02),
+//             borderRadius: const BorderRadius.only(
+//               bottomRight: Radius.circular(10),
+//               bottomLeft: Radius.circular(10),
+//             ),
+//           ),
+//         ),
+//         Container(
+//           margin: const EdgeInsets.symmetric(horizontal: 40),
+//           width: double.infinity,
+//           height: 10,
+//           decoration: BoxDecoration(
+//             color: Color(MyColors.bg03),
+//             borderRadius: const BorderRadius.only(
+//               bottomRight: Radius.circular(10),
+//               bottomLeft: Radius.circular(10),
+//             ),
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+// }
+
+// class ScheduleCard extends StatelessWidget {
+//   const ScheduleCard({
+//     Key? key,
+//   }) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       decoration: BoxDecoration(
+//         color: Color(MyColors.bg01),
+//         borderRadius: BorderRadius.circular(10),
+//       ),
+//       width: double.infinity,
+//       padding: const EdgeInsets.all(20),
+//       child: Row(
+//         crossAxisAlignment: CrossAxisAlignment.center,
+//         children: const [
+//           Icon(
+//             Icons.calendar_today,
+//             color: Colors.white,
+//             size: 15,
+//           ),
+//           SizedBox(
+//             width: 5,
+//           ),
+//           Text(
+//             'Mon, July 29',
+//             style: TextStyle(color: Colors.white),
+//           ),
+//           SizedBox(
+//             width: 20,
+//           ),
+//           Icon(
+//             Icons.access_alarm,
+//             color: Colors.white,
+//             size: 17,
+//           ),
+//           SizedBox(
+//             width: 5,
+//           ),
+//           Flexible(
+//             child: Text(
+//               '11:00 ~ 12:10',
+//               style: TextStyle(color: Colors.white),
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }

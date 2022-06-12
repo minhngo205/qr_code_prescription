@@ -40,7 +40,7 @@ class CardItems extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(30.0),
+            padding: const EdgeInsets.all(20.0),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -52,13 +52,11 @@ class CardItems extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
-                        "Chưa có tiền sử bệnh",
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: kTextColor),
+                        title,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, color: kTextColor),
                         maxLines: 3,
                         textAlign: TextAlign.justify,
                       ),

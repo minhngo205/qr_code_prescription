@@ -94,6 +94,12 @@ String dateformater(DateTime data) {
   return formatted;
 }
 
+String apiDateFormat(DateTime data) {
+  final DateFormat formatter = DateFormat('dd-MM-yyyy');
+  final String formatted = formatter.format(data);
+  return formatted;
+}
+
 calculateAge(DateTime birthDate) {
   DateTime currentDate = DateTime.now();
   int age = currentDate.year - birthDate.year;
@@ -110,3 +116,5 @@ calculateAge(DateTime birthDate) {
   }
   return age;
 }
+
+enum SingingCharacter { male, female }

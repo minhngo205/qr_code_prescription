@@ -1,8 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:qr_code_prescription/components/prescrip_card.dart';
-import 'package:qr_code_prescription/screens/prescription/personal_list_prescription.dart';
+import 'package:qr_code_prescription/screens/list_screen/list_screen.dart';
 import 'package:qr_code_prescription/services/dtos/prescription.dart';
 import 'package:qr_code_prescription/utils/constants.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -37,7 +36,11 @@ class RecentPres extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                Navigator.pushNamed(context, ListPresScreen.routeName);
+                Navigator.pushNamed(
+                  context,
+                  ListScreen.routeName,
+                  arguments: ListScreenArguments("prescription"),
+                );
               },
             )
           ],

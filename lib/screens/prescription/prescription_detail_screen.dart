@@ -44,6 +44,42 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
     super.initState();
   }
 
+  refreshData(int presID) async {
+    setState(() {
+      isLoading = true;
+    });
+    UserRepository userRepository = UserRepository();
+    Prescription? prescription = await userRepository.getPresDetail(presID);
+    if (prescription != null) {
+      Navigator.pushReplacementNamed(
+        context,
+        PrescriptionDetail.routeName,
+        arguments: PresDetailScreenArguments(prescription),
+      );
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+
+      Alert(
+        context: context,
+        type: AlertType.error,
+        title: "Lỗi",
+        desc: "Đã có lỗi xảy ra trong quá trình làm mới, xin hãy thử lại",
+        buttons: [
+          DialogButton(
+            child: const Text(
+              "Huỷ",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+            onPressed: () => Navigator.pop(context),
+            color: CupertinoColors.activeBlue,
+          ),
+        ],
+      ).show();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final args =
@@ -150,7 +186,7 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
     }
 
     return isLoading
-        ? Loading(haveText: true)
+        ? Loading(haveText: false)
         : Scaffold(
             backgroundColor: Colors.grey[200],
             body: Stack(
@@ -178,7 +214,9 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30),
                   child: RefreshIndicator(
-                    onRefresh: () async {},
+                    onRefresh: () async {
+                      refreshData(args.prescription.id);
+                    },
                     color: Colors.white,
                     backgroundColor: CupertinoColors.activeBlue,
                     strokeWidth: 5,

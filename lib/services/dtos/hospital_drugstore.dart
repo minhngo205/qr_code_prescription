@@ -1,31 +1,28 @@
 import 'base/user_base.dart';
-import 'hospital_drugstore.dart';
 
-class Doctor {
-  Doctor({
+class HospitalDrugstore {
+  HospitalDrugstore({
     required this.id,
     required this.user,
-    required this.hospital,
     required this.name,
-    required this.gender,
+    required this.address,
     required this.createdAt,
     required this.updatedAt,
   });
 
   int id;
   User user;
-  HospitalDrugstore hospital;
   String name;
-  bool gender;
+  String address;
   DateTime createdAt;
   DateTime updatedAt;
 
-  factory Doctor.fromJson(Map<String, dynamic> json) => Doctor(
+  factory HospitalDrugstore.fromJson(Map<String, dynamic> json) =>
+      HospitalDrugstore(
         id: json["id"],
         user: User.fromJson(json["user"]),
-        hospital: HospitalDrugstore.fromJson(json["hospital"]),
         name: json["name"],
-        gender: json["gender"],
+        address: json["address"],
         createdAt: DateTime.parse(json["created_at"]),
         updatedAt: DateTime.parse(json["updated_at"]),
       );
@@ -33,9 +30,8 @@ class Doctor {
   Map<String, dynamic> toJson() => {
         "id": id,
         "user": user.toJson(),
-        "hospital": hospital.toJson(),
         "name": name,
-        "gender": gender,
+        "address": address,
         "created_at": createdAt.toIso8601String(),
         "updated_at": updatedAt.toIso8601String(),
       };

@@ -2,11 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_prescription/components/default_button.dart';
 import 'package:qr_code_prescription/components/fab_bottom_app_bar.dart';
+import 'package:qr_code_prescription/screens/edit_screen/edit_info.dart';
 import 'package:qr_code_prescription/screens/errors/connection_lost.dart';
 import 'package:qr_code_prescription/screens/loading/loading_screen.dart';
 import 'package:qr_code_prescription/screens/main/home_screen/home_screen.dart';
+import 'package:qr_code_prescription/screens/main/notification_screen/notification_screen.dart';
+import 'package:qr_code_prescription/screens/main/schedule_screen/schedule_screen.dart';
 import 'package:qr_code_prescription/screens/main/user_profile/profile_screen.dart';
-import 'package:qr_code_prescription/screens/qr_code_screen/qr_screen.dart';
 import 'package:qr_code_prescription/services/dtos/prescription.dart';
 import 'package:qr_code_prescription/services/dtos/user_info.dart';
 import 'package:qr_code_prescription/services/storage/storage_service.dart';
@@ -53,22 +55,47 @@ class _MainScreenState extends State<MainScreen> {
       }
     }
 
-    userRepository.getUserPrescriptionList(1, 3).then((value) => {
-          if (value != null)
-            {
-              setState(() {
-                listPres = value;
-                isLoading = false;
-              })
-            }
-          else
-            {
-              setState(() {
-                listPres = [];
-                isLoading = false;
-              })
-            }
+    List<Prescription>? listFromStorage =
+        await storageRepository.getPrescriptionList();
+
+    if (listFromStorage != null) {
+      setState(() {
+        listPres = listFromStorage;
+        isLoading = false;
+      });
+    } else {
+      List<Prescription>? listFromAPI =
+          await userRepository.getUserPrescriptionList(true, 1, 3);
+
+      if (listFromAPI != null) {
+        setState(() {
+          listPres = listFromAPI;
+          isLoading = false;
         });
+      } else {
+        setState(() {
+          listPres = [];
+          isLoading = false;
+        });
+      }
+    }
+
+    // userRepository.getUserPrescriptionList(true, 1, 3).then((value) => {
+    //       if (value != null)
+    //         {
+    //           setState(() {
+    //             listPres = value;
+    //             isLoading = false;
+    //           })
+    //         }
+    //       else
+    //         {
+    //           setState(() {
+    //             listPres = [];
+    //             isLoading = false;
+    //           })
+    //         }
+    //     });
   }
 
   @override
@@ -92,7 +119,7 @@ class _MainScreenState extends State<MainScreen> {
               child: FloatingActionButton(
                 child: const Icon(CupertinoIcons.qrcode_viewfinder),
                 onPressed: () {
-                  Navigator.pushNamed(context, QRCodeScreen.routeName);
+                  // Navigator.pushNamed(context, QRCodeScreen.routeName);
                 },
               ),
             ),
@@ -106,6 +133,7 @@ class _MainScreenState extends State<MainScreen> {
               onTabSelected: (index) => setState(() {
                 _selectedIndex = index;
               }),
+              height: 70,
             ),
           );
   }
@@ -116,8 +144,9 @@ class _MainScreenState extends State<MainScreen> {
         userInfo: userInfo,
         listPres: listPres,
       ),
-      const Notification(),
-      const Message(),
+      const NotificationPage(),
+      const CalendarPage(),
+      // const EditInfoScreen(),
       ProfileScreen(
         userInfo: userInfo,
       ),
@@ -185,7 +214,7 @@ class Message extends StatelessWidget {
           StorageRepository storageRepository = StorageRepository();
           UserRepository repository = UserRepository();
           repository.getUserInfo();
-          repository.getUserPrescriptionList(1, 3);
+          repository.getUserPrescriptionList(false, 1, 3);
           storageRepository
               .getUserInfo()
               .then((value) => {debugPrint(value!.name)});

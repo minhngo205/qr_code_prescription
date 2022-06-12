@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:qr_code_prescription/services/dtos/prescription.dart';
 import 'package:qr_code_prescription/services/dtos/user_info.dart';
 
 class StorageRepository {
@@ -20,7 +21,7 @@ class StorageRepository {
     await _localStorage.write(key: "AccessToken", value: accessToken);
   }
 
-  void saveRefreshToken(String refreshToken) async {
+  saveRefreshToken(String refreshToken) async {
     await _localStorage.write(key: "RefreshToken", value: refreshToken);
   }
 
@@ -28,8 +29,8 @@ class StorageRepository {
     return await _localStorage.read(key: "AccessToken");
   }
 
-  Future<String?> getRefreshToken() {
-    return _localStorage.read(key: "RefreshToken");
+  Future<String?> getRefreshToken() async {
+    return await _localStorage.read(key: "RefreshToken");
   }
 
   void deleteToken() async {
@@ -50,5 +51,23 @@ class StorageRepository {
       return userInfo;
     }
     return null;
+  }
+
+  savePrescriptionList(List<Prescription> listPres) async {
+    List<String> savedList =
+        listPres.map((e) => json.encode(e.toJson())).toList();
+    await _localStorage.write(key: 'listofpres', value: jsonEncode(savedList));
+  }
+
+  Future<List<Prescription>?> getPrescriptionList() async {
+    String? stringofitems = await _localStorage.read(key: 'listofpres');
+    if (stringofitems?.isNotEmpty ?? false) {
+      List<dynamic> listofitems = jsonDecode(stringofitems!);
+      List<Prescription> result = listofitems
+          .map((e) => Prescription.fromJson(json.decode(e)))
+          .toList();
+      return result;
+    }
+    return [];
   }
 }

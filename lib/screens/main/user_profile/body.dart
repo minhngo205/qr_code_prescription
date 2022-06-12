@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:qr_code_prescription/screens/edit_screen/change_password.dart';
 import 'package:qr_code_prescription/screens/login/login_screen.dart';
+import 'package:qr_code_prescription/screens/medical_info/user_info.dart';
 import 'package:qr_code_prescription/services/dtos/user_info.dart';
 import 'package:qr_code_prescription/services/storage/storage_service.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -52,7 +54,9 @@ class ProfileBody extends StatelessWidget {
           ProfileMenu(
             text: "Thông tin cá nhân",
             icon: CupertinoIcons.person_fill,
-            press: () => {},
+            press: () => {
+              Navigator.pushNamed(context, UserInfoPage.routeName),
+            },
           ),
           ProfileMenu(
             text: "Thông báo",
@@ -60,12 +64,14 @@ class ProfileBody extends StatelessWidget {
             press: () {},
           ),
           ProfileMenu(
-            text: "Cài đặt",
+            text: "Đổi mật khẩu",
             icon: CupertinoIcons.settings_solid,
-            press: () {},
+            press: () {
+              Navigator.pushNamed(context, ChangePassword.routeName);
+            },
           ),
           ProfileMenu(
-            text: "Tợ giúp",
+            text: "Trợ giúp",
             icon: CupertinoIcons.question_circle_fill,
             press: () {},
           ),

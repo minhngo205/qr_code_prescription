@@ -54,10 +54,12 @@ class AuthenticationRepository {
     if (refreshToken == null) {
       return false;
     }
-    final response =
-        await http.post(Uri.parse(baseURL + "/token/refresh"), body: {
-      'refresh': refreshToken,
-    });
+    final response = await http.post(
+      Uri.parse(baseURL + "/token/refresh"),
+      body: {
+        'refresh': refreshToken,
+      },
+    );
     if (response.statusCode == 200) {
       var convertedDataToJson = jsonDecode(utf8.decode(response.bodyBytes));
       var data = Map<String, dynamic>.from(convertedDataToJson);
