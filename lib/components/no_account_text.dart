@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qr_code_prescription/screens/register/register_screen.dart';
-import 'package:qr_code_prescription/utils/constants.dart';
+import 'package:qr_code_prescription/screens/authen/register/register_screen.dart';
 import 'package:qr_code_prescription/utils/size_config.dart';
 import 'package:qr_code_prescription/utils/theme/light_color.dart';
 

@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'size_config.dart';
 
 const baseURL = "https://yshuynh.pythonanywhere.com/api";
@@ -117,4 +119,20 @@ calculateAge(DateTime birthDate) {
   return age;
 }
 
-enum SingingCharacter { male, female }
+const String kRefreshFail = "refresh-fail";
+
+showAlertDiaglog(
+  BuildContext context,
+  AlertType alertType,
+  String title,
+  String description,
+  List<DialogButton> buttonList,
+) {
+  Alert(
+    context: context,
+    type: alertType,
+    title: title,
+    desc: description,
+    buttons: buttonList,
+  ).show();
+}

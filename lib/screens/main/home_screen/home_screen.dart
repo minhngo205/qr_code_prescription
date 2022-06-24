@@ -10,29 +10,6 @@ import 'package:qr_code_prescription/utils/constants.dart';
 
 import '../../../services/dtos/prescription.dart';
 
-List<Map> doctors = [
-  {
-    'img': 'assets/doctor02.png',
-    'doctorName': 'Dr. Gardner Pearson',
-    'doctorTitle': 'Heart Specialist'
-  },
-  {
-    'img': 'assets/doctor03.jpeg',
-    'doctorName': 'Dr. Rosa Williamson',
-    'doctorTitle': 'Skin Specialist'
-  },
-  {
-    'img': 'assets/doctor02.png',
-    'doctorName': 'Dr. Gardner Pearson',
-    'doctorTitle': 'Heart Specialist'
-  },
-  {
-    'img': 'assets/doctor03.jpeg',
-    'doctorName': 'Dr. Rosa Williamson',
-    'doctorTitle': 'Skin Specialist'
-  }
-];
-
 class HomeTab extends StatefulWidget {
   const HomeTab({
     Key? key,
@@ -234,11 +211,11 @@ Widget buildHelpCard(BuildContext context) {
             text: TextSpan(
               children: [
                 const TextSpan(
-                  text: "Liên hệ ngay\nCơ sở y tế gần nhất\n",
+                  text: "Tiêm vaccine\n\n",
                   style: TextStyle(color: Colors.white, fontSize: 18),
                 ),
                 TextSpan(
-                  text: "Nếu có kết quả dương tính",
+                  text: "Là biện pháp phòng ngừa COVID-19 tốt nhất",
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.7),
                   ),

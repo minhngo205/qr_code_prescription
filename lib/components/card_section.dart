@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_prescription/components/custom_clipper.dart';
 import 'package:qr_code_prescription/utils/constants.dart';

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:qr_code_prescription/services/dtos/user_info.dart';
 import 'package:qr_code_prescription/services/storage/storage_service.dart';
 import 'package:qr_code_prescription/utils/constants.dart';
@@ -51,7 +52,7 @@ class AuthenticationRepository {
   Future<bool> refreshToken() async {
     debugPrint("Refresh Token");
     String? refreshToken = await _storageRepository.getRefreshToken();
-    if (refreshToken == null) {
+    if (refreshToken == null || JwtDecoder.isExpired(refreshToken)) {
       return false;
     }
     final response = await http.post(

@@ -6,6 +6,7 @@ import 'package:qr_code_prescription/components/default_button.dart';
 import 'package:qr_code_prescription/model/gender.dart';
 import 'package:qr_code_prescription/screens/errors/connection_lost.dart';
 import 'package:qr_code_prescription/screens/loading/loading_screen.dart';
+import 'package:qr_code_prescription/screens/authen/login/login_screen.dart';
 import 'package:qr_code_prescription/services/dtos/user_info.dart';
 import 'package:qr_code_prescription/services/storage/storage_service.dart';
 import 'package:qr_code_prescription/services/user_service/user_service.dart';
@@ -64,7 +65,6 @@ class _EditInfoScreenState extends State<EditInfoScreen> {
   }
 
   loadData() async {
-    debugPrint(Navigator.defaultRouteName);
     UserInfo? userFromStorage = await storageRepository.getUserInfo();
     if (userFromStorage != null) {
       debugPrint("Get user from storage");
@@ -74,20 +74,24 @@ class _EditInfoScreenState extends State<EditInfoScreen> {
         isLoading = false;
       });
     } else {
-      UserInfo? userFromAPI = await userRepository.getUserInfo();
-      if (userFromAPI != null) {
+      var userFromAPI = await userRepository.getUserInfo();
+      if (userFromAPI == RequestStatus.RefreshFail) {
+        storageRepository.deleteToken();
+        Navigator.pushNamedAndRemoveUntil(
+            context, LoginScreen.routeName, (route) => false);
+      } else if (userFromAPI == RequestStatus.RequestFail) {
+        debugPrint("Error");
+        Navigator.pushReplacementNamed(
+          context,
+          ConnectionFaildScreen.routeName,
+        );
+      } else {
         debugPrint("Get user from API");
         setState(() {
           userInfo = userFromAPI;
           initFirstValue(userInfo);
           isLoading = false;
         });
-      } else {
-        debugPrint("Error");
-        Navigator.pushReplacementNamed(
-          context,
-          ConnectionFaildScreen.routeName,
-        );
       }
     }
   }
@@ -442,8 +446,33 @@ class _EditInfoScreenState extends State<EditInfoScreen> {
     setState(() {
       isLoading = true;
     });
-    UserInfo? updatedInfo = await userRepository.updateUserInfo(userInfo);
-    if (updatedInfo != null) {
+    var updatedInfo = await userRepository.updateUserInfo(userInfo);
+    if (updatedInfo == RequestStatus.RefreshFail) {
+      storageRepository.deleteToken();
+      Navigator.pushNamedAndRemoveUntil(
+          context, LoginScreen.routeName, (route) => false);
+    } else if (updatedInfo == RequestStatus.RequestFail) {
+      setState(() {
+        isLoading = false;
+      });
+
+      Alert(
+        context: context,
+        type: AlertType.error,
+        title: "Lỗi",
+        desc: "Đã có lỗi xảy ra trong quá trình cập nhật thông tin",
+        buttons: [
+          DialogButton(
+            child: const Text(
+              "Huỷ",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+            onPressed: () => Navigator.pop(context),
+            color: CupertinoColors.activeBlue,
+          ),
+        ],
+      ).show();
+    } else if (updatedInfo != null) {
       await storageRepository.saveUserInfo(updatedInfo);
       setState(() {
         userInfo = updatedInfo;
@@ -459,27 +488,6 @@ class _EditInfoScreenState extends State<EditInfoScreen> {
           DialogButton(
             child: const Text(
               "Xác nhận",
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-            onPressed: () => Navigator.pop(context),
-            color: CupertinoColors.activeBlue,
-          ),
-        ],
-      ).show();
-    } else {
-      setState(() {
-        isLoading = false;
-      });
-
-      Alert(
-        context: context,
-        type: AlertType.error,
-        title: "Lỗi",
-        desc: "Đã có lỗi xảy ra trong quá trình cập nhật thông tin",
-        buttons: [
-          DialogButton(
-            child: const Text(
-              "Huỷ",
               style: TextStyle(color: Colors.white, fontSize: 20),
             ),
             onPressed: () => Navigator.pop(context),

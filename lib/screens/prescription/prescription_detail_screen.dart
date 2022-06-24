@@ -6,6 +6,7 @@ import 'package:qr_code_prescription/components/card_main.dart';
 import 'package:qr_code_prescription/components/card_section.dart';
 import 'package:qr_code_prescription/components/custom_clipper.dart';
 import 'package:qr_code_prescription/screens/loading/loading_screen.dart';
+import 'package:qr_code_prescription/screens/authen/login/login_screen.dart';
 import 'package:qr_code_prescription/screens/qr_code_screen/qr_screen.dart';
 import 'package:qr_code_prescription/services/dtos/medicine_list.dart';
 import 'package:qr_code_prescription/services/dtos/prescription.dart';
@@ -27,9 +28,9 @@ class PrescriptionDetail extends StatefulWidget {
 class _PrescriptionDetailState extends State<PrescriptionDetail> {
   bool isLoading = true;
   late UserInfo userInfo;
+  StorageRepository storageRepository = StorageRepository();
 
   loadUserInfo() {
-    StorageRepository storageRepository = StorageRepository();
     storageRepository.getUserInfo().then((userinfo) => {
           setState(() {
             userInfo = userinfo!;
@@ -49,14 +50,12 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
       isLoading = true;
     });
     UserRepository userRepository = UserRepository();
-    Prescription? prescription = await userRepository.getPresDetail(presID);
-    if (prescription != null) {
-      Navigator.pushReplacementNamed(
-        context,
-        PrescriptionDetail.routeName,
-        arguments: PresDetailScreenArguments(prescription),
-      );
-    } else {
+    var prescription = await userRepository.getPresDetail(presID);
+    if (prescription == RequestStatus.RefreshFail) {
+      storageRepository.deleteToken();
+      Navigator.pushNamedAndRemoveUntil(
+          context, LoginScreen.routeName, (route) => false);
+    } else if (prescription == RequestStatus.RequestFail) {
       setState(() {
         isLoading = false;
       });
@@ -77,6 +76,12 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
           ),
         ],
       ).show();
+    } else {
+      Navigator.pushReplacementNamed(
+        context,
+        PrescriptionDetail.routeName,
+        arguments: PresDetailScreenArguments(prescription),
+      );
     }
   }
 
@@ -131,9 +136,13 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
         },
       );
       UserRepository userRepository = UserRepository();
-      String presToken =
+      var presToken =
           await userRepository.getPresToken(args.prescription.id.toString());
-      if (presToken == "Failed") {
+      if (presToken == RequestStatus.RefreshFail) {
+        storageRepository.deleteToken();
+        Navigator.pushNamedAndRemoveUntil(
+            context, LoginScreen.routeName, (route) => false);
+      } else if (presToken == RequestStatus.RequestFail) {
         Navigator.of(context).pop();
         Alert(
           context: context,
@@ -258,7 +267,7 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
                           borderRadius: BorderRadius.circular(10.0),
                           child: Container(
                             padding: const EdgeInsets.all(20.0),
-                            height: 250,
+                            height: 300,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -276,14 +285,19 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
                                 const SizedBox(
                                   height: 5,
                                 ),
-                                Text(
-                                  "Dr. " +
-                                      args.prescription.doctor.name.toString(),
-                                  style: const TextStyle(
-                                    color: CupertinoColors.black,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.normal,
-                                  ),
+                                Row(
+                                  children: [
+                                    Text(
+                                      "Dr. " +
+                                          args.prescription.doctor.name
+                                              .toString(),
+                                      style: const TextStyle(
+                                        color: CupertinoColors.black,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 const SizedBox(
                                   height: 5,

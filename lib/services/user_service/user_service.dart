@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:qr_code_prescription/services/authentication/authentication_service.dart';
 import 'package:qr_code_prescription/services/dtos/pres_pagination_response.dart';
 import 'package:qr_code_prescription/services/dtos/prescription.dart';
@@ -9,6 +9,8 @@ import 'package:qr_code_prescription/services/storage/storage_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:qr_code_prescription/services/user_service/api.dart';
 import 'package:qr_code_prescription/utils/constants.dart';
+
+enum RequestStatus { RefreshFail, RequestSuccess, RequestFail }
 
 class UserRepository {
   static final UserRepository _instance = UserRepository._internal();
@@ -26,17 +28,20 @@ class UserRepository {
     api = Api();
   }
 
-  Future<UserInfo?> getUserInfo() async {
-    bool isSuccess = await _authenticationRepository.refreshToken();
-    if (!isSuccess) {
-      debugPrint("Can not refresh token");
-      return null;
+  Future getUserInfo() async {
+    String? accessToken = await _storageRepository.getAccessToken();
+    if (JwtDecoder.isExpired(accessToken!)) {
+      bool isSuccess = await _authenticationRepository.refreshToken();
+      if (!isSuccess) {
+        debugPrint("Can not refresh token");
+        return RequestStatus.RefreshFail;
+      }
+      accessToken = await _storageRepository.getAccessToken();
     }
-    String? token = await _storageRepository.getAccessToken();
     final response = await http.get(
       Uri.parse(baseURL + "/patients/a/info"),
       headers: {
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer $accessToken',
       },
     );
     debugPrint(utf8.decode(response.bodyBytes));
@@ -49,47 +54,55 @@ class UserRepository {
       return userInfo;
     } else {
       debugPrint(utf8.decode(response.bodyBytes));
-      return null;
+      return RequestStatus.RequestFail;
     }
   }
 
   Future getPaginationPres(int page, int pageSize) async {
-    bool refreshResult = await _authenticationRepository.refreshToken();
-    if (!refreshResult) {
-      debugPrint("Can not refresh token");
-      return null;
+    String? accessToken = await _storageRepository.getAccessToken();
+    if (JwtDecoder.isExpired(accessToken!)) {
+      bool isSuccess = await _authenticationRepository.refreshToken();
+      if (!isSuccess) {
+        debugPrint("Can not refresh token");
+        return RequestStatus.RefreshFail;
+      }
+      accessToken = await _storageRepository.getAccessToken();
     }
-    String? token = await _storageRepository.getAccessToken();
+    debugPrint("Get Here");
     final response = await http.get(
       Uri.parse(
           baseURL + "/patients/a/prescriptions?page=$page&page_size=$pageSize"),
       headers: {
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer $accessToken',
       },
     );
-    // ignore: prefer_typing_uninitialized_variables
-    var convertedDataToJson;
+    debugPrint(utf8.decode(response.bodyBytes));
+    var convertedDataToJson = jsonDecode(utf8.decode(response.bodyBytes));
+    debugPrint("Get here three");
     if (response.statusCode == 200) {
-      convertedDataToJson = jsonDecode(utf8.decode(response.bodyBytes));
-      return PrescriptionPaginationResponse.fromJson(convertedDataToJson);
+      return PrescriptionPaginationResponse.fromJson(convertedDataToJson)
+          .results;
     } else {
       debugPrint(utf8.decode(response.bodyBytes));
-      return null;
+      return [];
     }
   }
 
   Future getUserPrescriptionList(bool isCache, int page, int pageSize) async {
-    bool refreshResult = await _authenticationRepository.refreshToken();
-    if (!refreshResult) {
-      debugPrint("Can not refresh token");
-      return [];
+    String? accessToken = await _storageRepository.getAccessToken();
+    if (JwtDecoder.isExpired(accessToken!)) {
+      bool isSuccess = await _authenticationRepository.refreshToken();
+      if (!isSuccess) {
+        debugPrint("Can not refresh token");
+        return RequestStatus.RefreshFail;
+      }
+      accessToken = await _storageRepository.getAccessToken();
     }
-    String? token = await _storageRepository.getAccessToken();
     final response = await http.get(
       Uri.parse(
           baseURL + "/patients/a/prescriptions?page=$page&page_size=$pageSize"),
       headers: {
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer $accessToken',
       },
     );
     // ignore: prefer_typing_uninitialized_variables
@@ -106,19 +119,22 @@ class UserRepository {
     }
   }
 
-  Future<Prescription?> getPresDetail(int presID) async {
-    bool isSuccess = await _authenticationRepository.refreshToken();
-    if (!isSuccess) {
-      debugPrint("Can not refresh token");
-      return null;
+  Future getPresDetail(int presID) async {
+    String? accessToken = await _storageRepository.getAccessToken();
+    if (JwtDecoder.isExpired(accessToken!)) {
+      bool isSuccess = await _authenticationRepository.refreshToken();
+      if (!isSuccess) {
+        debugPrint("Can not refresh token");
+        return RequestStatus.RefreshFail;
+      }
+      accessToken = await _storageRepository.getAccessToken();
     }
-    String? token = await _storageRepository.getAccessToken();
     final response = await http.get(
       Uri.parse(
         baseURL + "/patients/a/prescriptions/$presID",
       ),
       headers: {
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer $accessToken',
       },
     );
     if (response.statusCode == 200) {
@@ -127,23 +143,26 @@ class UserRepository {
       return result;
     } else {
       debugPrint(utf8.decode(response.bodyBytes));
-      return null;
+      return RequestStatus.RequestFail;
     }
   }
 
-  Future<String> getPresToken(String id) async {
-    bool isSuccess = await _authenticationRepository.refreshToken();
-    if (!isSuccess) {
-      debugPrint("Can not refresh token");
-      return "Failed";
+  Future getPresToken(String id) async {
+    String? accessToken = await _storageRepository.getAccessToken();
+    if (JwtDecoder.isExpired(accessToken!)) {
+      bool isSuccess = await _authenticationRepository.refreshToken();
+      if (!isSuccess) {
+        debugPrint("Can not refresh token");
+        return RequestStatus.RefreshFail;
+      }
+      accessToken = await _storageRepository.getAccessToken();
     }
-    String? token = await _storageRepository.getAccessToken();
     final response = await http.get(
       Uri.parse(
         baseURL + "/patients/a/prescriptions/$id/token",
       ),
       headers: {
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer $accessToken',
       },
     );
     // ignore: prefer_typing_uninitialized_variables
@@ -162,22 +181,25 @@ class UserRepository {
       if (data['detail'] != null || data['detail'].toString().isNotEmpty) {
         return data['detail'];
       } else {
-        return "Failed";
+        return RequestStatus.RequestFail;
       }
     }
   }
 
-  Future<UserInfo?> updateUserInfo(UserInfo userInfo) async {
-    bool isSuccess = await _authenticationRepository.refreshToken();
-    if (!isSuccess) {
-      debugPrint("Can not refresh token");
-      return null;
+  Future updateUserInfo(UserInfo userInfo) async {
+    String? accessToken = await _storageRepository.getAccessToken();
+    if (JwtDecoder.isExpired(accessToken!)) {
+      bool isSuccess = await _authenticationRepository.refreshToken();
+      if (!isSuccess) {
+        debugPrint("Can not refresh token");
+        return RequestStatus.RefreshFail;
+      }
+      accessToken = await _storageRepository.getAccessToken();
     }
-    String? token = await _storageRepository.getAccessToken();
     final response = await http.patch(
       Uri.parse(baseURL + "/patients/a/info"),
       headers: {
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer $accessToken',
       },
       body: {
         'name': userInfo.name,
@@ -194,24 +216,35 @@ class UserRepository {
       return userInfo;
     } else {
       debugPrint(utf8.decode(response.bodyBytes));
-      return null;
+      return RequestStatus.RequestFail;
     }
   }
 
-  Future<bool> changePassword(String current, String newPass) async {
-    try {
-      final response = await api.dio.post(
-        "/users/a/change_password",
-        data: {
-          'old_password': current,
-          'new_password': newPass,
-        },
-      );
-      debugPrint(response.data.toString());
-      return true;
-    } on DioError catch (e) {
-      debugPrint(e.response!.data.toString());
-      return false;
+  Future changePassword(String current, String newPass) async {
+    String? accessToken = await _storageRepository.getAccessToken();
+    if (JwtDecoder.isExpired(accessToken!)) {
+      bool isSuccess = await _authenticationRepository.refreshToken();
+      if (!isSuccess) {
+        debugPrint("Can not refresh token");
+        return RequestStatus.RefreshFail;
+      }
+      accessToken = await _storageRepository.getAccessToken();
+    }
+    var response = await http.post(
+      Uri.parse(baseURL + "/users/a/change_password"),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+      body: {
+        'old_password': current,
+        'new_password': newPass,
+      },
+    );
+    var convertedDataToJson = jsonDecode(utf8.decode(response.bodyBytes));
+    if (response.statusCode == 200) {
+      return RequestStatus.RequestSuccess;
+    } else {
+      return convertedDataToJson['detail'];
     }
   }
 }

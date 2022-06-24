@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:qr_code_prescription/screens/loading/loading_screen.dart';
-import 'package:qr_code_prescription/screens/login/login_screen.dart';
+import 'package:qr_code_prescription/screens/authen/login/login_screen.dart';
 import 'package:qr_code_prescription/screens/main/main_screen.dart';
 import 'package:qr_code_prescription/services/storage/storage_service.dart';
 import 'package:qr_code_prescription/utils/route.dart';
@@ -25,7 +26,7 @@ class _QRCodeAppState extends State<QRCodeApp> {
   getInitRoute() async {
     StorageRepository storageRepository = StorageRepository();
     String? refreshToken = await storageRepository.getRefreshToken();
-    if (refreshToken == null) {
+    if (refreshToken == null || JwtDecoder.isExpired(refreshToken)) {
       setState(() {
         _initRoute = LoginScreen.routeName;
         isLoading = false;

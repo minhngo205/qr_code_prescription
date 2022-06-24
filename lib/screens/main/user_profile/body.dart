@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_prescription/screens/edit_screen/change_password.dart';
-import 'package:qr_code_prescription/screens/login/login_screen.dart';
+import 'package:qr_code_prescription/screens/authen/login/login_screen.dart';
 import 'package:qr_code_prescription/screens/medical_info/user_info.dart';
 import 'package:qr_code_prescription/services/dtos/user_info.dart';
 import 'package:qr_code_prescription/services/storage/storage_service.dart';
@@ -20,7 +20,8 @@ class ProfileBody extends StatelessWidget {
     logOut() {
       StorageRepository storageRepository = StorageRepository();
       storageRepository.deleteToken();
-      Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+      Navigator.pushNamedAndRemoveUntil(
+          context, LoginScreen.routeName, (route) => false);
     }
 
     return SingleChildScrollView(

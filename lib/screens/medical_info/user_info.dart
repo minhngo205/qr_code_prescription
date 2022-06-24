@@ -5,6 +5,7 @@ import 'package:qr_code_prescription/components/card_main.dart';
 import 'package:qr_code_prescription/screens/edit_screen/edit_info.dart';
 import 'package:qr_code_prescription/screens/errors/connection_lost.dart';
 import 'package:qr_code_prescription/screens/loading/loading_screen.dart';
+import 'package:qr_code_prescription/screens/authen/login/login_screen.dart';
 import 'package:qr_code_prescription/screens/medical_info/task_column.dart';
 import 'package:qr_code_prescription/services/dtos/user_info.dart';
 import 'package:qr_code_prescription/services/storage/storage_service.dart';
@@ -31,20 +32,28 @@ class _UserInfoPageState extends State<UserInfoPage> {
     UserInfo? userInfoFromStorage = await _storageRepository.getUserInfo();
     if (userInfoFromStorage != null) {
       setState(() {
-        userInfo = userInfoFromStorage!;
+        userInfo = userInfoFromStorage;
         isLoading = false;
       });
     } else {
       debugPrint("Get user info from network");
-      userInfoFromStorage = await _userRepository.getUserInfo();
-      if (userInfoFromStorage != null) {
+      var userFromAPI = await _userRepository.getUserInfo();
+      if (userFromAPI == RequestStatus.RefreshFail) {
+        _storageRepository.deleteToken();
+        Navigator.pushNamedAndRemoveUntil(
+            context, LoginScreen.routeName, (route) => false);
+      } else if (userFromAPI == RequestStatus.RequestFail) {
+        debugPrint("Error");
+        Navigator.pushReplacementNamed(
+          context,
+          ConnectionFaildScreen.routeName,
+        );
+      } else {
+        debugPrint("Get user from API");
         setState(() {
-          userInfo = userInfoFromStorage!;
+          userInfo = userFromAPI;
           isLoading = false;
         });
-      } else {
-        Navigator.pushReplacementNamed(
-            context, ConnectionFaildScreen.routeName);
       }
     }
   }
@@ -54,14 +63,12 @@ class _UserInfoPageState extends State<UserInfoPage> {
       isLoading = true;
     });
 
-    UserInfo? userInfoNetwork = await _userRepository.getUserInfo();
-    if (userInfoNetwork != null) {
-      await _storageRepository.saveUserInfo(userInfoNetwork);
-      setState(() {
-        userInfo = userInfoNetwork;
-        isLoading = false;
-      });
-    } else {
+    var userInfoNetwork = await _userRepository.getUserInfo();
+    if (userInfoNetwork == RequestStatus.RefreshFail) {
+      _storageRepository.deleteToken();
+      Navigator.pushNamedAndRemoveUntil(
+          context, LoginScreen.routeName, (route) => false);
+    } else if (userInfoNetwork == RequestStatus.RequestFail) {
       setState(() {
         isLoading = false;
       });
@@ -81,6 +88,12 @@ class _UserInfoPageState extends State<UserInfoPage> {
           ),
         ],
       ).show();
+    } else {
+      await _storageRepository.saveUserInfo(userInfoNetwork);
+      setState(() {
+        userInfo = userInfoNetwork;
+        isLoading = false;
+      });
     }
   }
 

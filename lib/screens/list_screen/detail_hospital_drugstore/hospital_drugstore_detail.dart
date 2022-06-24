@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:qr_code_prescription/screens/loading/loading_screen.dart';
 import 'package:qr_code_prescription/services/dtos/hospital_drugstore.dart';
 import 'package:qr_code_prescription/services/public_service/public_service.dart';
+import 'package:qr_code_prescription/utils/constants.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -16,8 +17,8 @@ class HospitalDrugstoreDetail extends StatefulWidget {
 }
 
 class _HospitalDrugstoreDetailState extends State<HospitalDrugstoreDetail> {
-  final _controller = PageController();
   bool isLoading = false;
+  late HospitalDrugstore hospitalDrugstore;
 
   refreshData(int detailID, String role) async {
     setState(() {
@@ -29,11 +30,10 @@ class _HospitalDrugstoreDetailState extends State<HospitalDrugstoreDetail> {
         await publicService.getDetailHospital(role + "s", detailID);
 
     if (detail != null) {
-      Navigator.pushReplacementNamed(
-        context,
-        HospitalDrugstoreDetail.routeName,
-        arguments: HospitalDrugstoreDetailArguments(detail),
-      );
+      setState(() {
+        hospitalDrugstore = detail;
+        isLoading = false;
+      });
     } else {
       setState(() {
         isLoading = false;
@@ -62,190 +62,275 @@ class _HospitalDrugstoreDetailState extends State<HospitalDrugstoreDetail> {
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments
         as HospitalDrugstoreDetailArguments;
-
-    Size size = MediaQuery.of(context).size;
-    return isLoading
-        ? Loading(haveText: true)
-        : RefreshIndicator(
-            onRefresh: () async {},
-            child: Scaffold(
-              appBar: AppBar(
-                elevation: 0,
-                leading: const Icon(Icons.arrow_back_ios_outlined,
-                    color: Colors.black, size: 18.0),
-                title: args.detail.user.role == "hospital"
-                    ? const Text(
-                        'Thông tin Bệnh viện',
-                        style: TextStyle(
-                          fontSize: 18.0,
-                          color: Colors.black,
-                        ),
-                      )
-                    : const Text(
-                        'Thông tin Nhà thuốc',
-                        style: TextStyle(
-                          fontSize: 18.0,
-                          color: Colors.black,
-                        ),
-                      ),
-              ),
-              body: SafeArea(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        width: size.width,
-                        height: 400,
-                        child: PageView(
-                          scrollDirection: Axis.horizontal,
-                          children: [
-                            args.detail.user.role == "hospital"
-                                ? Image.asset(
-                                    "assets/images/hospital.png",
-                                    width: 300,
-                                    height: 300,
-                                    fit: BoxFit.scaleDown,
-                                  )
-                                : Image.asset(
-                                    "assets/images/pharmacy.png",
-                                    width: 300,
-                                    height: 300,
-                                    fit: BoxFit.scaleDown,
-                                  )
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 20.0),
-                      Center(
-                        child: SmoothPageIndicator(
-                          controller: _controller,
-                          count: 1,
-                          effect: const ExpandingDotsEffect(
-                            activeDotColor: CupertinoColors.activeBlue,
-                            dotColor: CupertinoColors.inactiveGray,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20.0),
-                      Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 15.0),
-                        child: Text(
-                          'Mã số: ${args.detail.id}',
-                          style: const TextStyle(
-                            fontSize: 16.0,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10.0),
-                      Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 15.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              args.detail.name,
-                              style: const TextStyle(
-                                fontSize: 22.0,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.black,
-                              ),
-                            ),
-                            // const Text('\$120',
-                            //     style: TextStyle(
-                            //         fontSize: 25.0,
-                            //         color: Colors.black,
-                            //         fontFamily: 'Montserrat-black')),
-                          ],
-                        ),
-                      ),
-                      // const SizedBox(height: 30.0),
-                      // Container(
-                      //   margin: const EdgeInsets.symmetric(horizontal: 15.0),
-                      //   child: const Text('Sizes',
-                      //       style: const TextStyle(
-                      //           fontSize: 15.0,
-                      //           fontWeight: FontWeight.w600,
-                      //           color: Colors.black)),
-                      // ),
-                      // const SizedBox(height: 20.0),
-                      // SingleChildScrollView(
-                      //   scrollDirection: Axis.horizontal,
-                      //   child: Row(
-                      //     children: [
-                      //       const SizedBox(width: 10.0),
-                      //       _makeSizeButton('US7', true),
-                      //       const SizedBox(width: 8.0),
-                      //       _makeSizeButton('US7.5', true),
-                      //       const SizedBox(width: 8.0),
-                      //       _makeSizeButton('US8', false),
-                      //       const SizedBox(width: 8.0),
-                      //       _makeSizeButton('US8.5', true),
-                      //       const SizedBox(width: 8.0),
-                      //       _makeSizeButton('US9', true),
-                      //       const SizedBox(width: 8.0),
-                      //       _makeSizeButton('US9.5', true),
-                      //     ],
-                      //   ),
-                      // ),
-                      // const SizedBox(height: 20.0),
-                      // Container(
-                      //   margin: const EdgeInsets.symmetric(horizontal: 15.0),
-                      //   child: const Text('*Faster Shipping options may be available',
-                      //       style: const TextStyle(fontSize: 13.0, color: Colors.grey)),
-                      // ),
-                      const SizedBox(height: 30.0),
-                      Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 15.0),
-                        child: const Text('Địa chỉ',
-                            style: TextStyle(
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black)),
-                      ),
-                      const SizedBox(height: 15.0),
-                      Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 15.0),
-                        child: Text(
-                          args.detail.address,
-                          style: const TextStyle(
-                            fontSize: 15.0,
-                            color: Colors.grey,
-                            height: 1.5,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+    setState(() {
+      hospitalDrugstore = args.detail;
+    });
+    return Scaffold(
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            pinned: true,
+            title: hospitalDrugstore.user.role == "hospital"
+                ? const Text('Bệnh viện')
+                : const Text('Nhà thuốc'),
+            backgroundColor: CupertinoColors.activeBlue,
+            expandedHeight: 200,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Image(
+                image: hospitalDrugstore.user.role == "hospital"
+                    ? const AssetImage('assets/images/hospital.png')
+                    : const AssetImage('assets/images/pharmacy.png'),
+                fit: BoxFit.cover,
               ),
             ),
-          );
-  }
-
-  Widget _makeSizeButton(String size, bool available) {
-    return Container(
-      width: 80.0,
-      height: 30.0,
-      decoration: BoxDecoration(
-        borderRadius: const BorderRadius.all(const Radius.circular(30.0)),
-        border: available
-            ? Border.all(color: Colors.grey, width: 0.3)
-            : Border.all(color: Colors.transparent, width: 0),
-        color: available ? Colors.white : Colors.grey[300],
+          ),
+          SliverToBoxAdapter(
+            child: DetailBody(info: hospitalDrugstore),
+          )
+        ],
       ),
-      child: Center(
-        child: Text(size,
-            style: available
-                ? const TextStyle(
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black)
-                : TextStyle(
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey[50])),
+    );
+  }
+}
+
+class DetailBody extends StatelessWidget {
+  final HospitalDrugstore info;
+  const DetailBody({
+    Key? key,
+    required this.info,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.only(bottom: 30),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          NameBannerCard(hospitalDrugstore: info),
+          const SizedBox(
+            height: 15,
+          ),
+          const DoctorInfo(),
+          const SizedBox(
+            height: 30,
+          ),
+          Text(
+            "Địa chỉ",
+            style: kTitleStyle,
+          ),
+          const SizedBox(
+            height: 15,
+          ),
+          Text(
+            info.address,
+            style: const TextStyle(
+              color: CupertinoColors.black,
+              fontWeight: FontWeight.w500,
+              height: 1.5,
+            ),
+          ),
+          const SizedBox(
+            height: 25,
+          ),
+          Text(
+            'Địa chỉ',
+            style: kTitleStyle,
+          ),
+          const SizedBox(
+            height: 25,
+          ),
+          const DoctorLocation(),
+          const SizedBox(
+            height: 25,
+          ),
+          ElevatedButton(
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all<Color>(
+                Color(MyColors.primary),
+              ),
+            ),
+            child: const Text('Thông tin chi tiết'),
+            onPressed: () => {},
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class DoctorLocation extends StatelessWidget {
+  const DoctorLocation({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 200,
+      child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Image.asset("assets/images/fakemap.jpg")
+          // FlutterMap(
+          //   options: MapOptions(
+          //     center: latLng.LatLng(51.5, -0.09),
+          //     zoom: 13.0,
+          //   ),
+          //   layers: [
+          //     TileLayerOptions(
+          //       urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+          //       subdomains: ['a', 'b', 'c'],
+          //     ),
+          //   ],
+          // ),
+          ),
+    );
+  }
+}
+
+class DoctorInfo extends StatelessWidget {
+  const DoctorInfo({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: const [
+        NumberCard(
+          label: 'Patients',
+          value: '100+',
+        ),
+        SizedBox(width: 15),
+        NumberCard(
+          label: 'Experiences',
+          value: '10 years',
+        ),
+        SizedBox(width: 15),
+        NumberCard(
+          label: 'Rating',
+          value: '4.0',
+        ),
+      ],
+    );
+  }
+}
+
+class AboutDoctor extends StatelessWidget {
+  final String title;
+  final String desc;
+  const AboutDoctor({
+    Key? key,
+    required this.title,
+    required this.desc,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+  }
+}
+
+class NumberCard extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const NumberCard({
+    Key? key,
+    required this.label,
+    required this.value,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          color: Color(MyColors.bg03),
+        ),
+        padding: const EdgeInsets.symmetric(
+          vertical: 30,
+          horizontal: 15,
+        ),
+        child: Column(
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                color: Color(MyColors.grey02),
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Text(
+              value,
+              style: TextStyle(
+                color: Color(MyColors.header01),
+                fontSize: 15,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class NameBannerCard extends StatelessWidget {
+  final HospitalDrugstore hospitalDrugstore;
+  const NameBannerCard({
+    Key? key,
+    required this.hospitalDrugstore,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        child: Container(
+          padding: const EdgeInsets.all(15),
+          width: double.infinity,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      hospitalDrugstore.name,
+                      style: const TextStyle(
+                          color: CupertinoColors.black,
+                          fontWeight: FontWeight.w700),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      hospitalDrugstore.address,
+                      style: TextStyle(
+                        color: Color(MyColors.grey02),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Image(
+              //   image: AssetImage('assets/doctor01.jpeg'),
+              //   width: 100,
+              // )
+            ],
+          ),
+        ),
       ),
     );
   }

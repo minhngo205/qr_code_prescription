@@ -5,6 +5,7 @@ import 'package:qr_code_prescription/components/fab_bottom_app_bar.dart';
 import 'package:qr_code_prescription/screens/edit_screen/edit_info.dart';
 import 'package:qr_code_prescription/screens/errors/connection_lost.dart';
 import 'package:qr_code_prescription/screens/loading/loading_screen.dart';
+import 'package:qr_code_prescription/screens/authen/login/login_screen.dart';
 import 'package:qr_code_prescription/screens/main/home_screen/home_screen.dart';
 import 'package:qr_code_prescription/screens/main/notification_screen/notification_screen.dart';
 import 'package:qr_code_prescription/screens/main/schedule_screen/schedule_screen.dart';
@@ -40,18 +41,23 @@ class _MainScreenState extends State<MainScreen> {
         userInfo = userFromStorage;
       });
     } else {
-      UserInfo? userFromAPI = await userRepository.getUserInfo();
-      if (userFromAPI != null) {
-        debugPrint("Get user from API");
-        setState(() {
-          userInfo = userFromAPI;
-        });
-      } else {
+      var userFromAPI = await userRepository.getUserInfo();
+      if (userFromAPI == RequestStatus.RefreshFail) {
+        storageRepository.deleteToken();
+        Navigator.pushNamedAndRemoveUntil(
+            context, LoginScreen.routeName, (route) => false);
+      } else if (userFromAPI == RequestStatus.RequestFail) {
         debugPrint("Error");
         Navigator.pushReplacementNamed(
           context,
           ConnectionFaildScreen.routeName,
         );
+      } else {
+        debugPrint("Get user from API");
+        setState(() {
+          userInfo = userFromAPI;
+          isLoading = false;
+        });
       }
     }
 
@@ -64,17 +70,16 @@ class _MainScreenState extends State<MainScreen> {
         isLoading = false;
       });
     } else {
-      List<Prescription>? listFromAPI =
+      var listFromAPI =
           await userRepository.getUserPrescriptionList(true, 1, 3);
 
-      if (listFromAPI != null) {
-        setState(() {
-          listPres = listFromAPI;
-          isLoading = false;
-        });
+      if (listFromAPI == RequestStatus.RefreshFail) {
+        storageRepository.deleteToken();
+        Navigator.pushNamedAndRemoveUntil(
+            context, LoginScreen.routeName, (route) => false);
       } else {
         setState(() {
-          listPres = [];
+          listPres = listFromAPI;
           isLoading = false;
         });
       }
@@ -155,19 +160,23 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<FABBottomAppBarItem> _navBarsItems = [
     FABBottomAppBarItem(
-      iconData: CupertinoIcons.home,
+      iconData: CupertinoIcons.house_fill,
+      inactiveIcon: CupertinoIcons.house,
       text: 'Trang chủ',
     ),
     FABBottomAppBarItem(
-      iconData: CupertinoIcons.bell,
+      iconData: CupertinoIcons.bell_fill,
+      inactiveIcon: CupertinoIcons.bell,
       text: 'Thông báo',
     ),
     FABBottomAppBarItem(
-      iconData: CupertinoIcons.calendar,
-      text: 'Danh mục',
+      iconData: CupertinoIcons.location_solid,
+      inactiveIcon: CupertinoIcons.location,
+      text: 'Bản đồ y tế',
     ),
     FABBottomAppBarItem(
-      iconData: CupertinoIcons.person,
+      iconData: CupertinoIcons.person_fill,
+      inactiveIcon: CupertinoIcons.person,
       text: 'Cá nhân',
     ),
   ];
@@ -211,13 +220,13 @@ class Message extends StatelessWidget {
         text: "Test",
         textColor: CupertinoColors.white,
         press: () {
-          StorageRepository storageRepository = StorageRepository();
-          UserRepository repository = UserRepository();
-          repository.getUserInfo();
-          repository.getUserPrescriptionList(false, 1, 3);
-          storageRepository
-              .getUserInfo()
-              .then((value) => {debugPrint(value!.name)});
+          // StorageRepository storageRepository = StorageRepository();
+          // UserRepository repository = UserRepository();
+          // repository.getUserInfo();
+          // repository.getUserPrescriptionList(false, 1, 3);
+          // storageRepository
+          //     .getUserInfo()
+          //     .then((value) => {debugPrint(value!.name)});
         },
       ),
     );

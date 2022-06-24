@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:qr_code_prescription/components/default_button.dart';
+import 'package:qr_code_prescription/screens/authen/login/login_screen.dart';
+import 'package:qr_code_prescription/services/storage/storage_service.dart';
 import 'package:qr_code_prescription/services/user_service/api.dart';
 import 'package:qr_code_prescription/services/user_service/user_service.dart';
 import 'package:qr_code_prescription/utils/constants.dart';
@@ -66,7 +68,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                       ),
                       SizedBox(height: getProportionateScreenHeight(15)),
                       buildChagePassFromField(),
-                      SizedBox(height: getProportionateScreenHeight(20)),
+                      SizedBox(height: getProportionateScreenHeight(30)),
                       DefaultButton(
                         text: "Đổi mật khẩu",
                         press: () {
@@ -239,16 +241,18 @@ class _ChangePasswordState extends State<ChangePassword> {
         },
       );
 
-      Api api = Api();
-      bool isSuccess = await api.changePassword(currentPass!, newPass!);
+      UserRepository userRepository = UserRepository();
+      StorageRepository storageRepository = StorageRepository();
+      var response =
+          await userRepository.changePassword(currentPass!, newPass!);
 
       Navigator.pop(context);
-      if (isSuccess) {
+      if (response == RequestStatus.RequestSuccess) {
         Alert(
           context: context,
           type: AlertType.success,
           title: "Thành công",
-          desc: "Cập nhật thông tin thành công",
+          desc: "Đổi mật khẩu thành công",
           buttons: [
             DialogButton(
               child: const Text(
@@ -260,12 +264,16 @@ class _ChangePasswordState extends State<ChangePassword> {
             ),
           ],
         ).show();
+      } else if (response == RequestStatus.RefreshFail) {
+        storageRepository.deleteToken();
+        Navigator.pushNamedAndRemoveUntil(
+            context, LoginScreen.routeName, (route) => false);
       } else {
         Alert(
           context: context,
           type: AlertType.error,
           title: "Lỗi",
-          desc: "Đã có lỗi xảy ra trong quá trình đổi mật khẩu",
+          desc: response,
           buttons: [
             DialogButton(
               child: const Text(

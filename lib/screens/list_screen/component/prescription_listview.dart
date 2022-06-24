@@ -1,7 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:qr_code_prescription/screens/authen/login/login_screen.dart';
 import 'package:qr_code_prescription/services/dtos/pres_pagination_response.dart';
 import 'package:qr_code_prescription/services/dtos/prescription.dart';
+import 'package:qr_code_prescription/services/storage/storage_service.dart';
 import 'package:qr_code_prescription/services/user_service/user_service.dart';
 import '../../../components/list_prescription_card.dart';
 
@@ -15,22 +18,27 @@ class PrescriptionListView extends StatefulWidget {
 class _PrescriptionListViewState extends State<PrescriptionListView> {
   final int _limit = 5;
   UserRepository userRepository = UserRepository();
+  StorageRepository storageRepository = StorageRepository();
 
   final PagingController<int, Prescription> _pagingController =
       PagingController(firstPageKey: 1);
 
   _fetchData(int pageKey) async {
     try {
-      PrescriptionPaginationResponse? response =
-          await userRepository.getPaginationPres(pageKey, _limit);
+      var response = await userRepository.getPaginationPres(pageKey, _limit);
 
-      if (response != null) {
-        bool isLastPgae = response.results.length < _limit;
+      if (response == RequestStatus.RefreshFail) {
+        storageRepository.deleteToken();
+        Navigator.pushNamedAndRemoveUntil(
+            context, LoginScreen.routeName, (route) => false);
+      } else {
+        bool isLastPgae = response.length < _limit;
+        debugPrint(isLastPgae.toString());
         if (isLastPgae) {
-          _pagingController.appendLastPage(response.results);
+          _pagingController.appendLastPage(response);
         } else {
           final nextPageKey = pageKey + 1;
-          _pagingController.appendPage(response.results, nextPageKey);
+          _pagingController.appendPage(response, nextPageKey);
         }
       }
     } catch (e) {
