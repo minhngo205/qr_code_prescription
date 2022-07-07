@@ -8,8 +8,10 @@ import 'package:qr_code_prescription/screens/loading/loading_screen.dart';
 import 'package:qr_code_prescription/screens/authen/login/login_screen.dart';
 import 'package:qr_code_prescription/screens/main/home_screen/home_screen.dart';
 import 'package:qr_code_prescription/screens/main/notification_screen/notification_screen.dart';
+import 'package:qr_code_prescription/screens/main/schedule_screen/map_screen.dart';
 import 'package:qr_code_prescription/screens/main/schedule_screen/schedule_screen.dart';
 import 'package:qr_code_prescription/screens/main/user_profile/profile_screen.dart';
+import 'package:qr_code_prescription/screens/qr_code_screen/identification_qr.dart';
 import 'package:qr_code_prescription/services/dtos/prescription.dart';
 import 'package:qr_code_prescription/services/dtos/user_info.dart';
 import 'package:qr_code_prescription/services/storage/storage_service.dart';
@@ -56,51 +58,25 @@ class _MainScreenState extends State<MainScreen> {
         debugPrint("Get user from API");
         setState(() {
           userInfo = userFromAPI;
-          isLoading = false;
         });
       }
     }
 
-    List<Prescription>? listFromStorage =
-        await storageRepository.getPrescriptionList();
+    var listFromAPI = await userRepository.getUserPrescriptionList(true, 1, 3);
 
-    if (listFromStorage != null) {
-      setState(() {
-        listPres = listFromStorage;
-        isLoading = false;
-      });
+    if (listFromAPI == RequestStatus.RefreshFail) {
+      storageRepository.deleteToken();
+      Navigator.pushNamedAndRemoveUntil(
+          context, LoginScreen.routeName, (route) => false);
     } else {
-      var listFromAPI =
-          await userRepository.getUserPrescriptionList(true, 1, 3);
-
-      if (listFromAPI == RequestStatus.RefreshFail) {
-        storageRepository.deleteToken();
-        Navigator.pushNamedAndRemoveUntil(
-            context, LoginScreen.routeName, (route) => false);
-      } else {
-        setState(() {
-          listPres = listFromAPI;
-          isLoading = false;
-        });
-      }
+      setState(() {
+        listPres = listFromAPI;
+      });
     }
 
-    // userRepository.getUserPrescriptionList(true, 1, 3).then((value) => {
-    //       if (value != null)
-    //         {
-    //           setState(() {
-    //             listPres = value;
-    //             isLoading = false;
-    //           })
-    //         }
-    //       else
-    //         {
-    //           setState(() {
-    //             listPres = [];
-    //             isLoading = false;
-    //           })
-    //         }
-    //     });
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
@@ -124,7 +100,7 @@ class _MainScreenState extends State<MainScreen> {
               child: FloatingActionButton(
                 child: const Icon(CupertinoIcons.qrcode_viewfinder),
                 onPressed: () {
-                  // Navigator.pushNamed(context, QRCodeScreen.routeName);
+                  Navigator.pushNamed(context, IdentificarionScreen.routeName);
                 },
               ),
             ),
@@ -150,7 +126,7 @@ class _MainScreenState extends State<MainScreen> {
         listPres: listPres,
       ),
       const NotificationPage(),
-      const CalendarPage(),
+      const MapScreen(),
       // const EditInfoScreen(),
       ProfileScreen(
         userInfo: userInfo,

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:qr_code_prescription/services/authentication/authentication_service.dart';
+import 'package:qr_code_prescription/services/dtos/hospital_drugstore_pagination.dart';
 import 'package:qr_code_prescription/services/dtos/pres_pagination_response.dart';
 import 'package:qr_code_prescription/services/dtos/prescription.dart';
 import 'package:qr_code_prescription/services/dtos/user_info.dart';
@@ -220,6 +221,34 @@ class UserRepository {
     }
   }
 
+  Future getInfoToken() async {
+    String? accessToken = await _storageRepository.getAccessToken();
+    if (JwtDecoder.isExpired(accessToken!)) {
+      bool isSuccess = await _authenticationRepository.refreshToken();
+      if (!isSuccess) {
+        debugPrint("Can not refresh token");
+        return RequestStatus.RefreshFail;
+      }
+      accessToken = await _storageRepository.getAccessToken();
+    }
+
+    final response = await http.get(
+      Uri.parse(baseURL + "/patients/a/info/token"),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    debugPrint(utf8.decode(response.bodyBytes));
+    if (response.statusCode == 200) {
+      var convertedDataToJson = jsonDecode(utf8.decode(response.bodyBytes));
+      var data = Map<String, dynamic>.from(convertedDataToJson);
+      debugPrint(data['patient_info_token']);
+      return data['patient_info_token'];
+    } else {
+      return RequestStatus.RequestFail;
+    }
+  }
+
   Future changePassword(String current, String newPass) async {
     String? accessToken = await _storageRepository.getAccessToken();
     if (JwtDecoder.isExpired(accessToken!)) {
@@ -245,6 +274,38 @@ class UserRepository {
       return RequestStatus.RequestSuccess;
     } else {
       return convertedDataToJson['detail'];
+    }
+  }
+
+  Future getLocationNearBy(
+    int pageName,
+    int distance,
+    int long,
+    int lat,
+  ) async {
+    String? accessToken = await _storageRepository.getAccessToken();
+    if (JwtDecoder.isExpired(accessToken!)) {
+      bool isSuccess = await _authenticationRepository.refreshToken();
+      if (!isSuccess) {
+        debugPrint("Can not refresh token");
+        return RequestStatus.RefreshFail;
+      }
+      accessToken = await _storageRepository.getAccessToken();
+    }
+    final response = await http.get(
+      Uri.parse(baseURL +
+          "/$pageName?page_size=10?distance=$distance&longitude=$long&latitude=$lat"),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+    // debugPrint(utf8.decode(response.bodyBytes));
+    if (response.statusCode == 200) {
+      var convertedDataToJson = jsonDecode(utf8.decode(response.bodyBytes));
+      return HospitalDrugstorePagination.fromJson(convertedDataToJson);
+    } else {
+      debugPrint(utf8.decode(response.bodyBytes));
+      return null;
     }
   }
 }

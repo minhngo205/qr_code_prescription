@@ -41,8 +41,8 @@ class _RegisterFormState extends State<RegisterForm> {
     gapPadding: 10,
   );
 
-  bool _isObscure = false;
-  bool _isObscureConfirm = false;
+  bool _isObscure = true;
+  bool _isObscureConfirm = true;
 
   void addError({String? error}) {
     if (!errors.contains(error)) {
@@ -108,7 +108,8 @@ class _RegisterFormState extends State<RegisterForm> {
         onChanged: (value) {
           if (value.isNotEmpty) {
             removeError(error: kPassNullError);
-          } else if (password == confirmPassword) {
+          }
+          if (password == confirmPassword) {
             removeError(error: kMatchPassError);
           }
           confirmPassword = value;

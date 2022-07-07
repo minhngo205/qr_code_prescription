@@ -1,10 +1,14 @@
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'size_config.dart';
 
 const baseURL = "https://yshuynh.pythonanywhere.com/api";
+const googleMapAPIKey = "AIzaSyBr2Bt331Q26hFa-ghmULCXVVef9UWXRas";
 const kPrimaryColor = Color(0xFFFF7643);
 const kPrimaryLightColor = Color(0xFFFFECDF);
 const kPrimaryGradientColor = LinearGradient(
@@ -135,4 +139,14 @@ showAlertDiaglog(
     desc: description,
     buttons: buttonList,
   ).show();
+}
+
+Future<Uint8List> getBytesFromAsset(String path, int width) async {
+  ByteData data = await rootBundle.load(path);
+  ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
+      targetWidth: width);
+  ui.FrameInfo fi = await codec.getNextFrame();
+  return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
+      .buffer
+      .asUint8List();
 }

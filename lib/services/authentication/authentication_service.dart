@@ -30,7 +30,9 @@ class AuthenticationRepository {
         'name': fullname,
       },
     );
+    debugPrint(response.body);
     var convertedDataToJson = jsonDecode(utf8.decode(response.bodyBytes));
+    debugPrint(convertedDataToJson.toString());
 
     if (response.statusCode == 200) {
       UserInfo userInfo = UserInfo.fromJson(convertedDataToJson);
@@ -38,13 +40,8 @@ class AuthenticationRepository {
       return "Success";
     } else {
       var data = Map<String, dynamic>.from(convertedDataToJson);
-      if (data["phone_number"] != null) {
-        debugPrint(data["phone_number"][0]);
-        return data["phone_number"][0];
-      }
-      if (data["password"] != null) {
-        debugPrint(data["password"][0]);
-        return data["password"][0];
+      if (data["detail"] != null) {
+        return data["detail"];
       }
     }
   }

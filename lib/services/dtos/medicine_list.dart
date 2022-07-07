@@ -1,29 +1,33 @@
 import 'base/medicine.dart';
 
-class MedicineItems {
-  MedicineItems({
+class MedicineItem {
+  MedicineItem({
     required this.id,
     required this.medicine,
     required this.amount,
-    required this.note,
+    required this.doctorNote,
+    required this.pharmacistNote,
   });
 
   int id;
   Medicine medicine;
   int amount;
-  String note;
+  String doctorNote;
+  String pharmacistNote;
 
-  factory MedicineItems.fromJson(Map<String, dynamic> json) => MedicineItems(
+  factory MedicineItem.fromJson(Map<String, dynamic> json) => MedicineItem(
         id: json["id"],
         medicine: Medicine.fromJson(json["medicine"]),
         amount: json["amount"],
-        note: json["note"],
+        doctorNote: json["doctor_note"],
+        pharmacistNote: json["pharmacist_note"],
       );
 
   Map<String, dynamic> toJson() => {
         "id": id,
         "medicine": medicine.toJson(),
         "amount": amount,
-        "note": note,
+        "doctor_note": doctorNote,
+        "pharmacist_note": pharmacistNote,
       };
 }

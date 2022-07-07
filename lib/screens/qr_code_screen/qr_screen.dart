@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 
 class QRCodeScreen extends StatefulWidget {
-  static String routeName = "/splash";
+  static String routeName = "/prescription_qr";
   const QRCodeScreen({Key? key}) : super(key: key);
 
   @override

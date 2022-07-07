@@ -148,7 +148,7 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
           context: context,
           type: AlertType.error,
           title: "Lỗi",
-          desc: "Đã có lỗi xảy ra trong quá trình tại mã QR",
+          desc: "Đã có lỗi xảy ra trong quá trình tạo mã QR",
           buttons: [
             DialogButton(
               child: const Text(
@@ -394,7 +394,7 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
                           child: ListView(
                             scrollDirection: Axis.horizontal,
                             children: <Widget>[
-                              for (MedicineItems medicineitem
+                              for (MedicineItem medicineitem
                                   in args.prescription.medicineItems)
                                 CardSection(
                                   title: medicineitem.medicine.name,

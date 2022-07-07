@@ -11,6 +11,7 @@ class RegisterScreen extends StatelessWidget {
       backgroundColor: Colors.grey[300],
       appBar: AppBar(
         backgroundColor: Colors.grey[300],
+        iconTheme: const IconThemeData(color: Colors.black),
         elevation: 0,
       ),
       body: const Body(),

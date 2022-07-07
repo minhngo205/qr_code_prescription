@@ -9,6 +9,7 @@ import 'package:qr_code_prescription/screens/list_screen/list_screen.dart';
 import 'package:qr_code_prescription/screens/medical_info/user_info.dart';
 import 'package:qr_code_prescription/screens/prescription/prescription_detail_screen.dart';
 import 'package:qr_code_prescription/screens/authen/register/register_screen.dart';
+import 'package:qr_code_prescription/screens/qr_code_screen/identification_qr.dart';
 import 'package:qr_code_prescription/screens/qr_code_screen/qr_screen.dart';
 
 final Map<String, WidgetBuilder> routes = {
@@ -25,4 +26,5 @@ final Map<String, WidgetBuilder> routes = {
       const HospitalDrugstoreDetail(),
   EditInfoScreen.routeName: (context) => const EditInfoScreen(),
   ChangePassword.routeName: (context) => const ChangePassword(),
+  IdentificarionScreen.routeName: (context) => const IdentificarionScreen(),
 };
