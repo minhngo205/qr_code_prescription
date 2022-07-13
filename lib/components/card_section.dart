@@ -9,6 +9,7 @@ class CardSection extends StatelessWidget {
   final String time;
   final ImageProvider image;
   final bool isDone;
+  final String instruction;
 
   const CardSection(
       {Key? key,
@@ -17,7 +18,8 @@ class CardSection extends StatelessWidget {
       required this.unit,
       required this.time,
       required this.image,
-      required this.isDone})
+      required this.isDone,
+      required this.instruction})
       : super(key: key);
 
   @override
@@ -63,7 +65,7 @@ class CardSection extends StatelessWidget {
                         color: Theme.of(context).colorScheme.secondary,
                       ),
                       Text(
-                        time,
+                        "Tổng: $time",
                         style: const TextStyle(fontSize: 15, color: kTextColor),
                       ),
                     ],
@@ -93,7 +95,6 @@ class CardSection extends StatelessWidget {
                           ],
                         ),
                       ),
-                      const SizedBox(width: 10),
                       InkWell(
                         child: Container(
                           decoration: BoxDecoration(
@@ -119,6 +120,20 @@ class CardSection extends StatelessWidget {
                           debugPrint("Button clicked. Handle button setState");
                         },
                       )
+                    ],
+                  ),
+                  const SizedBox(height: 15),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        instruction,
+                        style: const TextStyle(
+                          fontSize: 17,
+                          color: kTextColor,
+                        ),
+                        maxLines: 5,
+                      ),
                     ],
                   ),
                 ],

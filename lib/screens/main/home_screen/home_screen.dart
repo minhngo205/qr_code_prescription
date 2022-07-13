@@ -5,10 +5,10 @@ import 'package:qr_code_prescription/screens/main/home_screen/recent_pres.dart';
 import 'package:qr_code_prescription/screens/main/home_screen/welcome_card.dart';
 import 'package:qr_code_prescription/screens/list_screen/list_screen.dart';
 import 'package:qr_code_prescription/screens/medical_info/user_info.dart';
-import 'package:qr_code_prescription/services/dtos/user_info.dart';
+import 'package:qr_code_prescription/model/dtos/user_info.dart';
 import 'package:qr_code_prescription/utils/constants.dart';
 
-import '../../../services/dtos/prescription.dart';
+import '../../../model/dtos/prescription_item.dart';
 
 class HomeTab extends StatefulWidget {
   const HomeTab({
@@ -17,7 +17,7 @@ class HomeTab extends StatefulWidget {
     required this.listPres,
   }) : super(key: key);
   final UserInfo userInfo;
-  final List<Prescription> listPres;
+  final List<PrescriptionItem> listPres;
 
   @override
   State<HomeTab> createState() => _HomeTabState();

@@ -2,21 +2,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_prescription/components/default_button.dart';
 import 'package:qr_code_prescription/components/fab_bottom_app_bar.dart';
-import 'package:qr_code_prescription/screens/edit_screen/edit_info.dart';
 import 'package:qr_code_prescription/screens/errors/connection_lost.dart';
 import 'package:qr_code_prescription/screens/loading/loading_screen.dart';
 import 'package:qr_code_prescription/screens/authen/login/login_screen.dart';
 import 'package:qr_code_prescription/screens/main/home_screen/home_screen.dart';
 import 'package:qr_code_prescription/screens/main/notification_screen/notification_screen.dart';
 import 'package:qr_code_prescription/screens/main/schedule_screen/map_screen.dart';
-import 'package:qr_code_prescription/screens/main/schedule_screen/schedule_screen.dart';
 import 'package:qr_code_prescription/screens/main/user_profile/profile_screen.dart';
 import 'package:qr_code_prescription/screens/qr_code_screen/identification_qr.dart';
-import 'package:qr_code_prescription/services/dtos/prescription.dart';
-import 'package:qr_code_prescription/services/dtos/user_info.dart';
+import 'package:qr_code_prescription/model/dtos/user_info.dart';
 import 'package:qr_code_prescription/services/storage/storage_service.dart';
 import 'package:qr_code_prescription/services/user_service/user_service.dart';
 import 'package:qr_code_prescription/utils/size_config.dart';
+
+import '../../model/dtos/prescription_item.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -30,7 +29,7 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
   bool isLoading = true;
   late UserInfo userInfo;
-  late List<Prescription> listPres;
+  late List<PrescriptionItem> listPres;
 
   loadData() async {
     StorageRepository storageRepository = StorageRepository();

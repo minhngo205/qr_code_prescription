@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:qr_code_prescription/screens/edit_screen/change_password.dart';
 import 'package:qr_code_prescription/screens/authen/login/login_screen.dart';
 import 'package:qr_code_prescription/screens/medical_info/user_info.dart';
-import 'package:qr_code_prescription/services/dtos/user_info.dart';
+import 'package:qr_code_prescription/model/dtos/user_info.dart';
 import 'package:qr_code_prescription/services/storage/storage_service.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 

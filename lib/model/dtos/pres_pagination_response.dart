@@ -1,8 +1,7 @@
-import 'package:qr_code_prescription/services/dtos/prescription.dart';
+import 'package:qr_code_prescription/model/dtos/prescription.dart';
+import 'package:qr_code_prescription/model/dtos/prescription_item.dart';
 
 import 'base/pagination_link.dart';
-import 'doctor.dart';
-import 'medicine_list.dart';
 
 class PrescriptionPaginationResponse {
   PrescriptionPaginationResponse({
@@ -17,7 +16,7 @@ class PrescriptionPaginationResponse {
   int total;
   int page;
   int pageSize;
-  List<Prescription> results;
+  List<PrescriptionItem> results;
 
   factory PrescriptionPaginationResponse.fromJson(Map<String, dynamic> json) =>
       PrescriptionPaginationResponse(
@@ -25,8 +24,8 @@ class PrescriptionPaginationResponse {
         total: json["total"],
         page: json["page"],
         pageSize: json["page_size"],
-        results: List<Prescription>.from(
-            json["results"].map((x) => Prescription.fromJson(x))),
+        results: List<PrescriptionItem>.from(
+            json["results"].map((x) => PrescriptionItem.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qr_code_prescription/services/dtos/user_info.dart';
+import 'package:qr_code_prescription/model/dtos/user_info.dart';
 import 'package:qr_code_prescription/services/storage/storage_service.dart';
 import 'package:qr_code_prescription/utils/constants.dart';
 
@@ -18,7 +18,6 @@ class _UserDetailCardState extends State<UserDetailCard>
   @override
   void initState() {
     getData();
-    // TODO: implement initState
     super.initState();
 
     animationController =
@@ -37,7 +36,6 @@ class _UserDetailCardState extends State<UserDetailCard>
 
   @override
   void dispose() {
-    // TODO: implement dispose
     animationController.dispose();
     super.dispose();
   }
@@ -88,7 +86,7 @@ class _UserDetailCardState extends State<UserDetailCard>
                           Transform(
                             transform: Matrix4.translationValues(
                                 muchDelayedAnimation.value * width, 0, 0),
-                            child: Center(
+                            child: const Center(
                               child: CircleAvatar(
                                 radius: 28,
                                 backgroundImage:
@@ -117,7 +115,7 @@ class _UserDetailCardState extends State<UserDetailCard>
                                             padding:
                                                 const EdgeInsets.only(top: 8.0),
                                             child: Container(
-                                              padding: EdgeInsets.all(5),
+                                              padding: const EdgeInsets.all(5),
                                               decoration: BoxDecoration(
                                                 color: Colors.orange[50],
                                                 borderRadius:
@@ -125,7 +123,7 @@ class _UserDetailCardState extends State<UserDetailCard>
                                               ),
                                               child: Text(
                                                 reg_no,
-                                                style: TextStyle(
+                                                style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 13,
                                                   color: Colors.deepOrange,
@@ -138,7 +136,7 @@ class _UserDetailCardState extends State<UserDetailCard>
                                                 top: 10.0),
                                             child: Text(
                                               name,
-                                              style: TextStyle(
+                                              style: const TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 21,
                                                 color: Colors.white,
@@ -155,18 +153,18 @@ class _UserDetailCardState extends State<UserDetailCard>
                                               children: [
                                                 Text(
                                                   department,
-                                                  style: TextStyle(
+                                                  style: const TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     color: Colors.white,
                                                   ),
                                                 ),
-                                                SizedBox(
+                                                const SizedBox(
                                                   width: 50,
                                                 ),
                                                 Text(
                                                   "Semester   " +
                                                       sem.toString(),
-                                                  style: TextStyle(
+                                                  style: const TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     color: Colors.white,
                                                   ),

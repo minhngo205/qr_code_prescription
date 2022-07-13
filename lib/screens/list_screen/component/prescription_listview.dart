@@ -1,9 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:qr_code_prescription/model/dtos/prescription_item.dart';
 import 'package:qr_code_prescription/screens/authen/login/login_screen.dart';
-import 'package:qr_code_prescription/services/dtos/pres_pagination_response.dart';
-import 'package:qr_code_prescription/services/dtos/prescription.dart';
 import 'package:qr_code_prescription/services/storage/storage_service.dart';
 import 'package:qr_code_prescription/services/user_service/user_service.dart';
 import '../../../components/list_prescription_card.dart';
@@ -20,7 +18,7 @@ class _PrescriptionListViewState extends State<PrescriptionListView> {
   UserRepository userRepository = UserRepository();
   StorageRepository storageRepository = StorageRepository();
 
-  final PagingController<int, Prescription> _pagingController =
+  final PagingController<int, PrescriptionItem> _pagingController =
       PagingController(firstPageKey: 1);
 
   _fetchData(int pageKey) async {
@@ -32,9 +30,9 @@ class _PrescriptionListViewState extends State<PrescriptionListView> {
         Navigator.pushNamedAndRemoveUntil(
             context, LoginScreen.routeName, (route) => false);
       } else {
-        bool isLastPgae = response.length < _limit;
-        debugPrint(isLastPgae.toString());
-        if (isLastPgae) {
+        bool isLastPage = response.length < _limit;
+        debugPrint(isLastPage.toString());
+        if (isLastPage) {
           _pagingController.appendLastPage(response);
         } else {
           final nextPageKey = pageKey + 1;
@@ -67,9 +65,9 @@ class _PrescriptionListViewState extends State<PrescriptionListView> {
         // 2
         () => _pagingController.refresh(),
       ),
-      child: PagedListView<int, Prescription>(
+      child: PagedListView<int, PrescriptionItem>(
         pagingController: _pagingController,
-        builderDelegate: PagedChildBuilderDelegate<Prescription>(
+        builderDelegate: PagedChildBuilderDelegate<PrescriptionItem>(
           itemBuilder: (context, item, index) => PrescriptionCard(
             prescription: item,
           ),

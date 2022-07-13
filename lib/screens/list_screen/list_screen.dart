@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_prescription/screens/list_screen/component/hospital_drugstore_listview.dart';
 import 'package:qr_code_prescription/screens/list_screen/component/prescription_listview.dart';
-import 'package:qr_code_prescription/components/user_detail_card.dart';
 
 class ListScreen extends StatefulWidget {
   const ListScreen({Key? key}) : super(key: key);

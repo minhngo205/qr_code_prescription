@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:qr_code_prescription/model/dtos/prescription_item.dart';
 import 'package:qr_code_prescription/services/authentication/authentication_service.dart';
-import 'package:qr_code_prescription/services/dtos/hospital_drugstore_pagination.dart';
-import 'package:qr_code_prescription/services/dtos/pres_pagination_response.dart';
-import 'package:qr_code_prescription/services/dtos/prescription.dart';
-import 'package:qr_code_prescription/services/dtos/user_info.dart';
+import 'package:qr_code_prescription/model/dtos/hospital_drugstore_pagination.dart';
+import 'package:qr_code_prescription/model/dtos/pres_pagination_response.dart';
+import 'package:qr_code_prescription/model/dtos/prescription.dart';
+import 'package:qr_code_prescription/model/dtos/user_info.dart';
 import 'package:qr_code_prescription/services/storage/storage_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:qr_code_prescription/services/user_service/api.dart';
@@ -110,7 +111,7 @@ class UserRepository {
     var convertedDataToJson;
     if (response.statusCode == 200) {
       convertedDataToJson = jsonDecode(utf8.decode(response.bodyBytes));
-      List<Prescription>? result =
+      List<PrescriptionItem> result =
           PrescriptionPaginationResponse.fromJson(convertedDataToJson).results;
       if (isCache) await _storageRepository.savePrescriptionList(result);
       return result;
@@ -278,10 +279,10 @@ class UserRepository {
   }
 
   Future getLocationNearBy(
-    int pageName,
+    String pageName,
     int distance,
-    int long,
-    int lat,
+    double long,
+    double lat,
   ) async {
     String? accessToken = await _storageRepository.getAccessToken();
     if (JwtDecoder.isExpired(accessToken!)) {
@@ -294,7 +295,7 @@ class UserRepository {
     }
     final response = await http.get(
       Uri.parse(baseURL +
-          "/$pageName?page_size=10?distance=$distance&longitude=$long&latitude=$lat"),
+          "/patients/a/$pageName?page_size=10&distance=$distance&longitude=$long&latitude=$lat"),
       headers: {
         'Authorization': 'Bearer $accessToken',
       },
@@ -302,9 +303,9 @@ class UserRepository {
     // debugPrint(utf8.decode(response.bodyBytes));
     if (response.statusCode == 200) {
       var convertedDataToJson = jsonDecode(utf8.decode(response.bodyBytes));
-      return HospitalDrugstorePagination.fromJson(convertedDataToJson);
+      return HospitalDrugstorePagination.fromJson(convertedDataToJson).results;
     } else {
-      debugPrint(utf8.decode(response.bodyBytes));
+      // debugPrint(utf8.decode(response.bodyBytes));
       return null;
     }
   }

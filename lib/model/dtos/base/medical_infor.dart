@@ -1,6 +1,5 @@
 class MedicalInfo {
   MedicalInfo({
-    required this.id,
     required this.height,
     required this.weight,
     required this.bodyTemperature,
@@ -12,19 +11,17 @@ class MedicalInfo {
     required this.updatedAt,
   });
 
-  int id;
-  int height;
-  int weight;
-  double bodyTemperature;
-  int systolicBloodPressure;
-  int diastolicBloodPressure;
+  num height;
+  num weight;
+  num bodyTemperature;
+  num systolicBloodPressure;
+  num diastolicBloodPressure;
   String bloodGroup;
   String medicalHistory;
   DateTime createdAt;
   DateTime updatedAt;
 
   factory MedicalInfo.fromJson(Map<String, dynamic> json) => MedicalInfo(
-        id: json["id"],
         height: json["height"],
         weight: json["weight"],
         bodyTemperature: json["body_temperature"],
@@ -37,7 +34,6 @@ class MedicalInfo {
       );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
         "height": height,
         "weight": weight,
         "body_temperature": bodyTemperature,

@@ -3,13 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:intl_phone_field/country_picker_dialog.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
-import 'package:qr_code_prescription/components/custom_surfix_icon.dart';
 import 'package:qr_code_prescription/components/default_button.dart';
 import 'package:qr_code_prescription/components/form_error.dart';
+import 'package:qr_code_prescription/screens/authen/otp/otp_screen.dart';
 import 'package:qr_code_prescription/services/authentication/authentication_service.dart';
 import 'package:qr_code_prescription/utils/constants.dart';
 import 'package:qr_code_prescription/utils/size_config.dart';
-import 'package:qr_code_prescription/utils/theme/light_color.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
@@ -125,6 +124,7 @@ class _RegisterFormState extends State<RegisterForm> {
           } else {
             removeError(error: kMatchPassError);
           }
+          return null;
         },
         decoration: InputDecoration(
           hintText: "Xác nhận mật khẩu",
@@ -135,8 +135,8 @@ class _RegisterFormState extends State<RegisterForm> {
               });
             },
             icon: _isObscureConfirm
-                ? const Icon(CupertinoIcons.eye)
-                : const Icon(CupertinoIcons.eye_slash_fill),
+                ? const Icon(CupertinoIcons.eye_slash_fill)
+                : const Icon(CupertinoIcons.eye),
           ),
           enabledBorder: outlineInputBorder,
           focusedBorder: outlineInputBorderFocus,
@@ -170,6 +170,7 @@ class _RegisterFormState extends State<RegisterForm> {
           } else {
             removeError(error: kPassNullError);
           }
+          return null;
         },
         decoration: InputDecoration(
           hintText: "Mật khẩu",
@@ -180,8 +181,8 @@ class _RegisterFormState extends State<RegisterForm> {
               });
             },
             icon: _isObscure
-                ? const Icon(CupertinoIcons.eye)
-                : const Icon(CupertinoIcons.eye_slash_fill),
+                ? const Icon(CupertinoIcons.eye_slash_fill)
+                : const Icon(CupertinoIcons.eye),
           ),
           enabledBorder: outlineInputBorder,
           focusedBorder: outlineInputBorderFocus,
@@ -231,6 +232,7 @@ class _RegisterFormState extends State<RegisterForm> {
           } else {
             removeError(error: kInvalidPhoneNoError);
           }
+          return null;
         },
         decoration: InputDecoration(
           hintText: "Số điện thoại",
@@ -286,11 +288,10 @@ class _RegisterFormState extends State<RegisterForm> {
   }
 
   void onRegisterPress(BuildContext context) async {
-    String registerResponse = await authRepository.register(
-      phoneNo!.completeNumber,
-      password!,
-      fullName!,
-    );
+    String registerResponse =
+        await authRepository.requestOTP(phoneNo!.completeNumber);
+    // register(
+    //     phoneNo!.completeNumber, password!, fullName!, "OTP123");
     if (registerResponse != "Success") {
       showTopSnackBar(
         context,
@@ -300,10 +301,17 @@ class _RegisterFormState extends State<RegisterForm> {
       clearError();
       showTopSnackBar(
         context,
-        const CustomSnackBar.success(
-            message: "Đã đăng ký thành công\nQuay trở lại trang đăng nhập"),
+        const CustomSnackBar.success(message: "Đã đăng ký thành công"),
       );
-      Navigator.pop(context);
+      Navigator.pushNamed(
+        context,
+        OtpScreen.routeName,
+        arguments: OTPScreenArguments(
+          phoneNo!.completeNumber,
+          password!,
+          fullName!,
+        ),
+      );
     }
   }
 

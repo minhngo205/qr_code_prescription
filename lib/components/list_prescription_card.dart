@@ -1,13 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_prescription/screens/prescription/prescription_detail_screen.dart';
-import 'package:qr_code_prescription/services/dtos/prescription.dart';
 import 'package:qr_code_prescription/utils/constants.dart';
+
+import '../model/dtos/prescription_item.dart';
 
 const double _borderRadius = 12;
 
 class PrescriptionCard extends StatelessWidget {
-  final Prescription prescription;
+  final PrescriptionItem prescription;
 
   const PrescriptionCard({
     Key? key,
@@ -18,11 +19,11 @@ class PrescriptionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(
-          context,
-          PrescriptionDetail.routeName,
-          arguments: PresDetailScreenArguments(prescription),
-        );
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    PrescriptionDetail(prescriptionID: prescription.id)));
       },
       child: Card(
         elevation: 5.0,

@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:qr_code_prescription/screens/authen/otp/otp_screen.dart';
 import 'package:qr_code_prescription/screens/edit_screen/change_password.dart';
 import 'package:qr_code_prescription/screens/edit_screen/edit_info.dart';
 import 'package:qr_code_prescription/screens/errors/connection_lost.dart';
@@ -17,7 +18,7 @@ final Map<String, WidgetBuilder> routes = {
   MainScreen.routeName: (context) => const MainScreen(),
   QRCodeScreen.routeName: (context) => const QRCodeScreen(),
   RegisterScreen.routeName: (context) => const RegisterScreen(),
-  PrescriptionDetail.routeName: (context) => const PrescriptionDetail(),
+  // PrescriptionDetail.routeName: (context) => const PrescriptionDetail(),
   ConnectionFaildScreen.routeName: (context) => const ConnectionFaildScreen(),
   // PersonalScreen.routeName: (context) => const PersonalScreen(),
   ListScreen.routeName: (context) => const ListScreen(),
@@ -27,4 +28,5 @@ final Map<String, WidgetBuilder> routes = {
   EditInfoScreen.routeName: (context) => const EditInfoScreen(),
   ChangePassword.routeName: (context) => const ChangePassword(),
   IdentificarionScreen.routeName: (context) => const IdentificarionScreen(),
+  OtpScreen.routeName: (context) => const OtpScreen(),
 };

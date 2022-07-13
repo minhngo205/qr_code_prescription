@@ -62,7 +62,7 @@ class WelcomeCard extends StatelessWidget {
                       const SizedBox(height: 12),
                       GestureDetector(
                         onTap: () {
-                          print("Tab");
+                          debugPrint("Tab");
                         },
                         child: Container(
                           padding: const EdgeInsets.all(12),

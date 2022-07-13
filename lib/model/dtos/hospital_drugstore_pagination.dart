@@ -1,4 +1,4 @@
-import 'package:qr_code_prescription/services/dtos/hospital_drugstore.dart';
+import 'package:qr_code_prescription/model/dtos/hospital_drugstore.dart';
 
 import 'base/pagination_link.dart';
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
-import 'package:qr_code_prescription/services/dtos/user_info.dart';
+import 'package:qr_code_prescription/model/dtos/user_info.dart';
 import 'package:qr_code_prescription/services/storage/storage_service.dart';
 import 'package:qr_code_prescription/utils/constants.dart';
 import 'dart:convert';
@@ -20,23 +20,34 @@ class AuthenticationRepository {
     _storageRepository = StorageRepository();
   }
 
-  Future register(String phoneNo, String password, String fullname) async {
+  Future register(
+    String phoneNo,
+    String password,
+    String fullname,
+    String otpCode,
+  ) async {
     debugPrint("register called: $phoneNo - $password - $fullname");
-    final response = await http.post(
+    final response = await http.put(
       Uri.parse(baseURL + "/patients/register"),
       body: {
         'phone_number': phoneNo,
         'password': password,
         'name': fullname,
+        'otp_code': otpCode,
       },
     );
-    debugPrint(response.body);
+
     var convertedDataToJson = jsonDecode(utf8.decode(response.bodyBytes));
     debugPrint(convertedDataToJson.toString());
 
     if (response.statusCode == 200) {
-      UserInfo userInfo = UserInfo.fromJson(convertedDataToJson);
-      _storageRepository.saveUserInfo(userInfo);
+      _storageRepository.saveRefreshToken(convertedDataToJson["refresh"]);
+      _storageRepository.saveAccessToken(convertedDataToJson["access"]);
+      debugPrint(
+          "Refresh Token: " + _storageRepository.getRefreshToken().toString());
+      debugPrint(
+          "Access Token: " + _storageRepository.getAccessToken().toString());
+      // await _userRepository.getUserInfo();
       return "Success";
     } else {
       var data = Map<String, dynamic>.from(convertedDataToJson);
@@ -93,6 +104,22 @@ class AuthenticationRepository {
           "Access Token: " + _storageRepository.getAccessToken().toString());
       // await _userRepository.getUserInfo();
       return "Success";
+    }
+  }
+
+  Future<String> requestOTP(String phoneNo) async {
+    var response = await http.put(
+      Uri.parse("$baseURL/users/otp"),
+      body: {
+        'phone_number': phoneNo,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return "Success";
+    } else {
+      var convertedDataToJson = jsonDecode(utf8.decode(response.bodyBytes));
+      return convertedDataToJson['detail'];
     }
   }
 }

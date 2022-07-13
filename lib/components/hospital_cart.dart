@@ -1,7 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_prescription/screens/list_screen/detail_hospital_drugstore/hospital_drugstore_detail.dart';
-import 'package:qr_code_prescription/services/dtos/hospital_drugstore.dart';
+import 'package:qr_code_prescription/model/dtos/hospital_drugstore.dart';
 
 class HospitalDrugstoreCard extends StatelessWidget {
   final HospitalDrugstore hospitalDrugstore;
@@ -31,11 +32,8 @@ class HospitalDrugstoreCard extends StatelessWidget {
             ),
             SizedBox(
               height: 200.0,
-              child: Ink.image(
-                image: hospitalDrugstore.user.role == "hospital"
-                    ? const AssetImage("assets/images/hospital.png")
-                    : const AssetImage("assets/images/pharmacy.png"),
-                fit: BoxFit.fitHeight,
+              child: Image(
+                image: CachedNetworkImageProvider(hospitalDrugstore.background),
               ),
             ),
             Container(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qr_code_prescription/services/dtos/user_info.dart';
+import 'package:qr_code_prescription/model/dtos/user_info.dart';
 
 import 'body.dart';
 

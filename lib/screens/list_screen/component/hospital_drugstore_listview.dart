@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:qr_code_prescription/components/hospital_cart.dart';
 import 'package:qr_code_prescription/services/public_service/public_service.dart';
-import 'package:qr_code_prescription/services/dtos/hospital_drugstore.dart';
-import 'package:qr_code_prescription/services/dtos/hospital_drugstore_pagination.dart';
+import 'package:qr_code_prescription/model/dtos/hospital_drugstore.dart';
+import 'package:qr_code_prescription/model/dtos/hospital_drugstore_pagination.dart';
 
 class HospitalDrugstoreListView extends StatefulWidget {
   const HospitalDrugstoreListView({Key? key, required this.pageName})

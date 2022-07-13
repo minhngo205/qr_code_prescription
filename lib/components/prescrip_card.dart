@@ -1,26 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:qr_code_prescription/screens/prescription/prescription_detail_screen.dart';
-import 'package:qr_code_prescription/services/dtos/prescription.dart';
 import 'package:qr_code_prescription/utils/constants.dart';
 
+import '../model/dtos/prescription_item.dart';
+
 class HomePresCard extends StatelessWidget {
-  final Prescription prescription;
+  final PrescriptionItem prescriptionItem;
+  // ignore: prefer_typing_uninitialized_variables
   final color;
   const HomePresCard({
     Key? key,
     required this.color,
-    required this.prescription,
+    required this.prescriptionItem,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(
-          context,
-          PrescriptionDetail.routeName,
-          arguments: PresDetailScreenArguments(prescription),
-        );
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    PrescriptionDetail(prescriptionID: prescriptionItem.id)));
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -36,12 +38,12 @@ class HomePresCard extends StatelessWidget {
             children: [
               const SizedBox(height: 10),
               Text(
-                'Đơn thuốc ' + prescription.id.toString(),
+                'Đơn thuốc ${prescriptionItem.id}',
                 style: const TextStyle(color: Colors.white),
               ),
               const SizedBox(height: 10),
               Text(
-                prescription.diagnostic,
+                prescriptionItem.diagnostic,
                 maxLines: 2,
                 style: const TextStyle(
                   color: Colors.white,
@@ -53,11 +55,11 @@ class HomePresCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    prescription.doctor.hospital.name,
+                    prescriptionItem.doctor.hospital.name,
                     style: const TextStyle(color: Colors.white),
                   ),
                   Text(
-                    dateformater(prescription.createdAt),
+                    dateformater(prescriptionItem.createdAt),
                     style: const TextStyle(color: Colors.white),
                   ),
                 ],

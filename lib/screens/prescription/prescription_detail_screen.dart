@@ -8,9 +8,9 @@ import 'package:qr_code_prescription/components/custom_clipper.dart';
 import 'package:qr_code_prescription/screens/loading/loading_screen.dart';
 import 'package:qr_code_prescription/screens/authen/login/login_screen.dart';
 import 'package:qr_code_prescription/screens/qr_code_screen/qr_screen.dart';
-import 'package:qr_code_prescription/services/dtos/medicine_list.dart';
-import 'package:qr_code_prescription/services/dtos/prescription.dart';
-import 'package:qr_code_prescription/services/dtos/user_info.dart';
+import 'package:qr_code_prescription/model/dtos/medicine_item.dart';
+import 'package:qr_code_prescription/model/dtos/prescription.dart';
+import 'package:qr_code_prescription/model/dtos/user_info.dart';
 import 'package:qr_code_prescription/services/storage/storage_service.dart';
 import 'package:qr_code_prescription/services/user_service/user_service.dart';
 import 'package:qr_code_prescription/utils/constants.dart';
@@ -18,8 +18,9 @@ import 'package:qr_code_prescription/utils/size_config.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 class PrescriptionDetail extends StatefulWidget {
-  const PrescriptionDetail({Key? key}) : super(key: key);
+  const PrescriptionDetail({Key? key, required this.prescriptionID}) : super(key: key);
   static String routeName = "/pres_detail";
+  final int prescriptionID;
 
   @override
   State<PrescriptionDetail> createState() => _PrescriptionDetailState();
@@ -27,44 +28,37 @@ class PrescriptionDetail extends StatefulWidget {
 
 class _PrescriptionDetailState extends State<PrescriptionDetail> {
   bool isLoading = true;
-  late UserInfo userInfo;
   StorageRepository storageRepository = StorageRepository();
-
-  loadUserInfo() {
-    storageRepository.getUserInfo().then((userinfo) => {
-          setState(() {
-            userInfo = userinfo!;
-            isLoading = false;
-          })
-        });
-  }
+  UserRepository userRepository = UserRepository();
+  late Prescription prescription;
 
   @override
   void initState() {
-    loadUserInfo();
+    getData(widget.prescriptionID);
     super.initState();
   }
 
-  refreshData(int presID) async {
+  getData(int presID) async {
     setState(() {
       isLoading = true;
     });
-    UserRepository userRepository = UserRepository();
-    var prescription = await userRepository.getPresDetail(presID);
-    if (prescription == RequestStatus.RefreshFail) {
+    var response = await userRepository.getPresDetail(presID);
+    if (response == RequestStatus.RefreshFail) {
       storageRepository.deleteToken();
       Navigator.pushNamedAndRemoveUntil(
           context, LoginScreen.routeName, (route) => false);
-    } else if (prescription == RequestStatus.RequestFail) {
+    } else if (response == RequestStatus.RequestFail) {
       setState(() {
         isLoading = false;
       });
+
+      Navigator.pop(context);
 
       Alert(
         context: context,
         type: AlertType.error,
         title: "Lỗi",
-        desc: "Đã có lỗi xảy ra trong quá trình làm mới, xin hãy thử lại",
+        desc: "Đã có lỗi xảy ra trong quá trình lấy thông tin, xin hãy thử lại",
         buttons: [
           DialogButton(
             child: const Text(
@@ -77,18 +71,15 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
         ],
       ).show();
     } else {
-      Navigator.pushReplacementNamed(
-        context,
-        PrescriptionDetail.routeName,
-        arguments: PresDetailScreenArguments(prescription),
-      );
+      setState(() {
+        prescription = response;
+        isLoading = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final args =
-        ModalRoute.of(context)!.settings.arguments as PresDetailScreenArguments;
 
     getMedicineImage(String usage) {
       if (usage == "Uống") {
@@ -135,9 +126,8 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
           );
         },
       );
-      UserRepository userRepository = UserRepository();
       var presToken =
-          await userRepository.getPresToken(args.prescription.id.toString());
+          await userRepository.getPresToken(widget.prescriptionID.toString());
       if (presToken == RequestStatus.RefreshFail) {
         storageRepository.deleteToken();
         Navigator.pushNamedAndRemoveUntil(
@@ -182,7 +172,7 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
       } else {
         Navigator.of(context).pop();
         Navigator.pushNamed(context, QRCodeScreen.routeName,
-            arguments: QRScreenArguments(args.prescription.id, presToken));
+            arguments: QRScreenArguments(widget.prescriptionID, presToken));
       }
     }
 
@@ -224,7 +214,7 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
                   padding: const EdgeInsets.symmetric(horizontal: 30),
                   child: RefreshIndicator(
                     onRefresh: () async {
-                      refreshData(args.prescription.id);
+                      getData(prescription.id);
                     },
                     color: Colors.white,
                     backgroundColor: CupertinoColors.activeBlue,
@@ -274,7 +264,7 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
                               children: <Widget>[
                                 // Rest Active Legend
                                 Text(
-                                  args.prescription.doctor.hospital.name
+                                  prescription.doctor.hospital.name
                                       .toString(),
                                   style: const TextStyle(
                                     color: CupertinoColors.black,
@@ -289,7 +279,7 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
                                   children: [
                                     Text(
                                       "Dr. " +
-                                          args.prescription.doctor.name
+                                          prescription.doctor.name
                                               .toString(),
                                       style: const TextStyle(
                                         color: CupertinoColors.black,
@@ -316,7 +306,7 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
                                         ),
                                       ),
                                       Text(
-                                        args.prescription.diagnostic.toString(),
+                                        prescription.diagnostic.toString(),
                                         style: const TextStyle(
                                           color: CupertinoColors.black,
                                           fontSize: 15,
@@ -341,7 +331,7 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
                                       ),
                                     ),
                                     Text(
-                                      args.prescription.id.toString(),
+                                      prescription.id.toString(),
                                       style: const TextStyle(
                                         color: CupertinoColors.black,
                                         fontSize: 16,
@@ -358,7 +348,7 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
                                       ),
                                     ),
                                     Text(
-                                      dateformater(args.prescription.createdAt),
+                                      dateformater(prescription.createdAt),
                                       style: const TextStyle(
                                         color: CupertinoColors.black,
                                         fontSize: 16,
@@ -390,23 +380,24 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
                           decoration: const BoxDecoration(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10.0))),
-                          height: 125,
+                          height: 180,
                           child: ListView(
                             scrollDirection: Axis.horizontal,
                             children: <Widget>[
                               for (MedicineItem medicineitem
-                                  in args.prescription.medicineItems)
+                                  in prescription.medicineItems)
                                 CardSection(
                                   title: medicineitem.medicine.name,
-                                  value: medicineitem.amount.toString(),
-                                  unit: "/ liều",
-                                  time: medicineitem.medicine.usage +
-                                      " " +
-                                      medicineitem.medicine.note,
+                                  value: medicineitem.medicine.tradeName,
+                                  unit: medicineitem.medicine.concentration,
+                                  time: medicineitem.medicine.usage == "Uống"
+                                      ? "${medicineitem.amount} viên"
+                                      : "${medicineitem.amount} liều",
                                   image: getMedicineImage(
                                       medicineitem.medicine.usage),
                                   isDone: getMedicineStatus(
-                                      args.prescription.status),
+                                      prescription.status),
+                                  instruction: medicineitem.doctorNote,
                                 ),
                             ],
                           ),
@@ -425,38 +416,78 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
 
                         const SizedBox(height: 20),
 
-                        Row(
+                        Column(
                           children: [
-                            const Text(
-                              "Tên: ",
-                              style: TextStyle(
-                                color: CupertinoColors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
+                            Row(
+                              children: [
+                                const Text(
+                                  "Tên: ",
+                                  style: TextStyle(
+                                    color: CupertinoColors.black,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  prescription.patient.name,
+                                  style: const TextStyle(
+                                    color: CupertinoColors.black,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const Expanded(child: SizedBox()),
+                                const Text(
+                                  "Tuổi: ",
+                                  style: TextStyle(
+                                    color: CupertinoColors.black,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  calculateAge(prescription.patient.dob).toString(),
+                                  style: const TextStyle(
+                                    color: CupertinoColors.black,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              userInfo.name,
-                              style: const TextStyle(
-                                color: CupertinoColors.black,
-                                fontSize: 16,
-                              ),
-                            ),
-                            const Expanded(child: SizedBox()),
-                            const Text(
-                              "Tuổi: ",
-                              style: TextStyle(
-                                color: CupertinoColors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              calculateAge(userInfo.dob).toString(),
-                              style: const TextStyle(
-                                color: CupertinoColors.black,
-                                fontSize: 16,
-                              ),
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                const Text(
+                                  "Giới tính: ",
+                                  style: TextStyle(
+                                    color: CupertinoColors.black,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  prescription.patient.gender ? "Nam" : "Nữ",
+                                  style: const TextStyle(
+                                    color: CupertinoColors.black,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const Expanded(child: SizedBox()),
+                                const Text(
+                                  "Nhóm máu: ",
+                                  style: TextStyle(
+                                    color: CupertinoColors.black,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  prescription.medicalInfo.bloodGroup,
+                                  style: const TextStyle(
+                                    color: CupertinoColors.black,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -477,7 +508,8 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
                                     image: const AssetImage(
                                         'assets/icons/high-temperature.png'),
                                     title: "Thân nhiệt",
-                                    value: userInfo.medicalInfo.bodyTemperature
+                                    value: prescription.medicalInfo
+                                        .bodyTemperature
                                         .toString(),
                                     unit: "°C",
                                     color: CupertinoColors.white,
@@ -486,12 +518,12 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
                                     image: const AssetImage(
                                         'assets/icons/hypertension.png'),
                                     title: "Huyết áp",
-                                    value: userInfo
-                                            .medicalInfo.systolicBloodPressure
+                                    value: prescription.medicalInfo
+                                            .systolicBloodPressure
                                             .toString() +
                                         " / " +
-                                        userInfo
-                                            .medicalInfo.diastolicBloodPressure
+                                        prescription.medicalInfo
+                                            .diastolicBloodPressure
                                             .toString(),
                                     unit: "mmHg",
                                     color: CupertinoColors.white,
@@ -506,8 +538,8 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
                                     image: const AssetImage(
                                         'assets/icons/height.png'),
                                     title: "Chiều cao",
-                                    value:
-                                        userInfo.medicalInfo.height.toString(),
+                                    value: prescription.medicalInfo.height
+                                        .toString(),
                                     unit: "cm",
                                     color: CupertinoColors.white,
                                   ),
@@ -515,8 +547,8 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
                                     image: const AssetImage(
                                         'assets/icons/weight.png'),
                                     title: "Cân nặng",
-                                    value:
-                                        userInfo.medicalInfo.weight.toString(),
+                                    value: prescription.medicalInfo.weight
+                                        .toString(),
                                     unit: "kg",
                                     color: CupertinoColors.white,
                                   ),
@@ -544,9 +576,7 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
                           physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
                           children: <Widget>[
-                            userInfo.medicalInfo.medicalHistory.isEmpty ||
-                                    userInfo.medicalInfo.medicalHistory ==
-                                        "None"
+                            prescription.medicalInfo.medicalHistory.isEmpty
                                 ? CardItems(
                                     image:
                                         Image.asset('assets/icons/cancel.png'),
@@ -556,7 +586,8 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
                                 : CardItems(
                                     image:
                                         Image.asset('assets/icons/checked.png'),
-                                    title: userInfo.medicalInfo.medicalHistory,
+                                    title: prescription.medicalInfo
+                                        .medicalHistory,
                                     color: CupertinoColors.activeGreen,
                                   )
                           ],
@@ -572,6 +603,43 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
 }
 
 class PresDetailScreenArguments {
-  final Prescription prescription;
-  PresDetailScreenArguments(this.prescription);
+  final int prescriptionId;
+  PresDetailScreenArguments(this.prescriptionId);
 }
+
+// showDialog(
+// barrierDismissible: false,
+// context: context,
+// builder: (_) {
+// return Dialog(
+// insetPadding: const EdgeInsets.symmetric(horizontal: 140),
+// elevation: 10,
+// backgroundColor: Colors.transparent,
+// child: Container(
+// width: 100.0,
+// height: 100.0,
+// decoration: BoxDecoration(
+// borderRadius: BorderRadius.circular(12),
+// color: CupertinoColors.activeBlue,
+// ),
+// child: Column(
+// mainAxisAlignment: MainAxisAlignment.center,
+// children: [
+// const SpinKitPouringHourGlassRefined(
+// color: CupertinoColors.white,
+// ),
+// Column(
+// children: const [
+// SizedBox(height: 10),
+// Text(
+// "Đang tải ...",
+// style: TextStyle(color: CupertinoColors.white),
+// ),
+// ],
+// )
+// ],
+// ),
+// ),
+// );
+// },
+// );

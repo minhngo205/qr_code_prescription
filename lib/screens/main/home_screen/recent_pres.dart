@@ -2,14 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_prescription/components/prescrip_card.dart';
 import 'package:qr_code_prescription/screens/list_screen/list_screen.dart';
-import 'package:qr_code_prescription/services/dtos/prescription.dart';
 import 'package:qr_code_prescription/utils/constants.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+
+import '../../../model/dtos/prescription_item.dart';
 
 class RecentPres extends StatelessWidget {
   RecentPres({Key? key, required this.listPres}) : super(key: key);
   final _controller = PageController();
-  final List<Prescription> listPres;
+  final List<PrescriptionItem> listPres;
   final colorList = [
     CupertinoColors.activeBlue,
     kPrimaryColor,
@@ -54,9 +55,9 @@ class RecentPres extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             controller: _controller,
             children: [
-              for (Prescription pres in listPres)
+              for (PrescriptionItem pres in listPres)
                 HomePresCard(
-                  prescription: pres,
+                  prescriptionItem: pres,
                   color: colorList[listPres.indexOf(pres)],
                 ),
               // PresCard(

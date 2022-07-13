@@ -212,8 +212,8 @@ class _LoginFormState extends State<LoginForm> {
               });
             },
             icon: _isObscure
-                ? const Icon(CupertinoIcons.eye)
-                : const Icon(CupertinoIcons.eye_slash_fill),
+                ? const Icon(CupertinoIcons.eye_slash_fill)
+                : const Icon(CupertinoIcons.eye),
           ),
           enabledBorder: outlineInputBorder,
           focusedBorder: outlineInputBorderFocus,

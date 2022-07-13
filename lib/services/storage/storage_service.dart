@@ -2,8 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:qr_code_prescription/services/dtos/prescription.dart';
-import 'package:qr_code_prescription/services/dtos/user_info.dart';
+import 'package:qr_code_prescription/model/dtos/prescription.dart';
+import 'package:qr_code_prescription/model/dtos/user_info.dart';
+
+import '../../model/dtos/prescription_item.dart';
 
 class StorageRepository {
   static final StorageRepository _instance = StorageRepository._internal();
@@ -36,6 +38,7 @@ class StorageRepository {
   void deleteToken() async {
     await _localStorage.delete(key: "AccessToken");
     await _localStorage.delete(key: "RefreshToken");
+    await _localStorage.delete(key: "UserInfo");
   }
 
   saveUserInfo(UserInfo userInfo) async {
@@ -53,7 +56,7 @@ class StorageRepository {
     return null;
   }
 
-  savePrescriptionList(List<Prescription> listPres) async {
+  savePrescriptionList(List<PrescriptionItem> listPres) async {
     List<String> savedList =
         listPres.map((e) => json.encode(e.toJson())).toList();
     await _localStorage.write(key: 'listofpres', value: jsonEncode(savedList));

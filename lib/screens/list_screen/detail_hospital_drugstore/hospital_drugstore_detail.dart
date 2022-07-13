@@ -1,11 +1,14 @@
+import 'dart:typed_data';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:qr_code_prescription/screens/loading/loading_screen.dart';
-import 'package:qr_code_prescription/services/dtos/hospital_drugstore.dart';
+import 'package:qr_code_prescription/model/dtos/hospital_drugstore.dart';
 import 'package:qr_code_prescription/services/public_service/public_service.dart';
 import 'package:qr_code_prescription/utils/constants.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class HospitalDrugstoreDetail extends StatefulWidget {
   const HospitalDrugstoreDetail({Key? key}) : super(key: key);
@@ -17,15 +20,14 @@ class HospitalDrugstoreDetail extends StatefulWidget {
 }
 
 class _HospitalDrugstoreDetailState extends State<HospitalDrugstoreDetail> {
-  bool isLoading = false;
+  bool isLoading = true;
   late HospitalDrugstore hospitalDrugstore;
+  PublicService publicService = PublicService();
+
+  late BitmapDescriptor hospitalIcon;
+  late BitmapDescriptor pharmacyIcon;
 
   refreshData(int detailID, String role) async {
-    setState(() {
-      isLoading = true;
-    });
-
-    PublicService publicService = PublicService();
     HospitalDrugstore? detail =
         await publicService.getDetailHospital(role + "s", detailID);
 
@@ -58,6 +60,26 @@ class _HospitalDrugstoreDetailState extends State<HospitalDrugstoreDetail> {
     }
   }
 
+  void setSourceAndDestinationMarkerIcons(BuildContext context) async {
+    final Uint8List hospital =
+        await getBytesFromAsset('assets/icons/hospital_marker.png', 100);
+
+    final Uint8List drugstore =
+        await getBytesFromAsset('assets/icons/pharmacy_marker.png', 100);
+
+    setState(() {
+      hospitalIcon = BitmapDescriptor.fromBytes(hospital);
+      pharmacyIcon = BitmapDescriptor.fromBytes(drugstore);
+      isLoading = false;
+    });
+  }
+
+  @override
+  void initState() {
+    setSourceAndDestinationMarkerIcons(context);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments
@@ -65,39 +87,48 @@ class _HospitalDrugstoreDetailState extends State<HospitalDrugstoreDetail> {
     setState(() {
       hospitalDrugstore = args.detail;
     });
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            pinned: true,
-            title: hospitalDrugstore.user.role == "hospital"
-                ? const Text('Bệnh viện')
-                : const Text('Nhà thuốc'),
-            backgroundColor: CupertinoColors.activeBlue,
-            expandedHeight: 200,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Image(
-                image: hospitalDrugstore.user.role == "hospital"
-                    ? const AssetImage('assets/images/hospital.png')
-                    : const AssetImage('assets/images/pharmacy.png'),
-                fit: BoxFit.cover,
-              ),
+    return isLoading
+        ? Loading(haveText: false)
+        : Scaffold(
+            body: CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  pinned: true,
+                  title: hospitalDrugstore.user.role == "hospital"
+                      ? const Text('Bệnh viện')
+                      : const Text('Nhà thuốc'),
+                  backgroundColor: CupertinoColors.activeBlue,
+                  expandedHeight: 200,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Image(
+                      image: CachedNetworkImageProvider(
+                          hospitalDrugstore.background),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: DetailBody(
+                    info: hospitalDrugstore,
+                    hospital: hospitalIcon,
+                    drugstore: pharmacyIcon,
+                  ),
+                )
+              ],
             ),
-          ),
-          SliverToBoxAdapter(
-            child: DetailBody(info: hospitalDrugstore),
-          )
-        ],
-      ),
-    );
+          );
   }
 }
 
 class DetailBody extends StatelessWidget {
   final HospitalDrugstore info;
+  final BitmapDescriptor hospital;
+  final BitmapDescriptor drugstore;
   const DetailBody({
     Key? key,
     required this.info,
+    required this.hospital,
+    required this.drugstore,
   }) : super(key: key);
 
   @override
@@ -109,10 +140,10 @@ class DetailBody extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           NameBannerCard(hospitalDrugstore: info),
-          const SizedBox(
-            height: 15,
-          ),
-          const DoctorInfo(),
+          // const SizedBox(
+          //   height: 15,
+          // ),
+          // const DoctorInfo(),
           const SizedBox(
             height: 30,
           ),
@@ -132,16 +163,74 @@ class DetailBody extends StatelessWidget {
             ),
           ),
           const SizedBox(
-            height: 25,
+            height: 30,
           ),
           Text(
-            'Địa chỉ',
+            "Số điện thoại",
+            style: kTitleStyle,
+          ),
+          const SizedBox(
+            height: 15,
+          ),
+          Text(
+            info.user.phoneNumber,
+            style: const TextStyle(
+              color: CupertinoColors.black,
+              fontWeight: FontWeight.w500,
+              height: 1.5,
+            ),
+          ),
+          const SizedBox(
+            height: 30,
+          ),
+          Text(
+            "Email",
+            style: kTitleStyle,
+          ),
+          const SizedBox(
+            height: 15,
+          ),
+          Text(
+            info.user.email.isEmpty ? "Chưa cập nhật email" : info.user.email,
+            style: const TextStyle(
+              color: CupertinoColors.black,
+              fontWeight: FontWeight.w500,
+              height: 1.5,
+            ),
+          ),
+          const SizedBox(
+            height: 30,
+          ),
+          Text(
+            "Trang web",
+            style: kTitleStyle,
+          ),
+          const SizedBox(
+            height: 15,
+          ),
+          Text(
+            info.website.isEmpty ? "Chưa cập nhật trang web" : info.website,
+            style: const TextStyle(
+              color: CupertinoColors.black,
+              fontWeight: FontWeight.w500,
+              height: 1.5,
+            ),
+          ),
+          const SizedBox(
+            height: 30,
+          ),
+          Text(
+            'Vị trí',
             style: kTitleStyle,
           ),
           const SizedBox(
             height: 25,
           ),
-          const DoctorLocation(),
+          DoctorLocation(
+            lat: double.parse(info.latitude),
+            long: double.parse(info.longitude),
+            icon: info.user.role == "hospital" ? hospital : drugstore,
+          ),
           const SizedBox(
             height: 25,
           ),
@@ -163,7 +252,14 @@ class DetailBody extends StatelessWidget {
 class DoctorLocation extends StatelessWidget {
   const DoctorLocation({
     Key? key,
+    required this.lat,
+    required this.long,
+    required this.icon,
   }) : super(key: key);
+
+  final double lat;
+  final double long;
+  final BitmapDescriptor icon;
 
   @override
   Widget build(BuildContext context) {
@@ -172,7 +268,21 @@ class DoctorLocation extends StatelessWidget {
       height: 200,
       child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
-          child: Image.asset("assets/images/fakemap.jpg")
+          child: GoogleMap(
+            initialCameraPosition: CameraPosition(
+              target: LatLng(lat, long),
+              zoom: 16,
+            ),
+            markers: {
+              Marker(
+                markerId: const MarkerId("curentLocation"),
+                position: LatLng(lat, long),
+                icon: icon,
+              ),
+            },
+            zoomControlsEnabled: false,
+          )
+          // Image.asset("assets/images/fakemap.jpg")
           // FlutterMap(
           //   options: MapOptions(
           //     center: latLng.LatLng(51.5, -0.09),
@@ -190,99 +300,6 @@ class DoctorLocation extends StatelessWidget {
   }
 }
 
-class DoctorInfo extends StatelessWidget {
-  const DoctorInfo({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: const [
-        NumberCard(
-          label: 'Patients',
-          value: '100+',
-        ),
-        SizedBox(width: 15),
-        NumberCard(
-          label: 'Experiences',
-          value: '10 years',
-        ),
-        SizedBox(width: 15),
-        NumberCard(
-          label: 'Rating',
-          value: '4.0',
-        ),
-      ],
-    );
-  }
-}
-
-class AboutDoctor extends StatelessWidget {
-  final String title;
-  final String desc;
-  const AboutDoctor({
-    Key? key,
-    required this.title,
-    required this.desc,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
-}
-
-class NumberCard extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const NumberCard({
-    Key? key,
-    required this.label,
-    required this.value,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15),
-          color: Color(MyColors.bg03),
-        ),
-        padding: const EdgeInsets.symmetric(
-          vertical: 30,
-          horizontal: 15,
-        ),
-        child: Column(
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                color: Color(MyColors.grey02),
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Text(
-              value,
-              style: TextStyle(
-                color: Color(MyColors.header01),
-                fontSize: 15,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class NameBannerCard extends StatelessWidget {
   final HospitalDrugstore hospitalDrugstore;
   const NameBannerCard({
@@ -292,44 +309,46 @@ class NameBannerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        child: Container(
-          padding: const EdgeInsets.all(15),
-          width: double.infinity,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      hospitalDrugstore.name,
-                      style: const TextStyle(
-                          color: CupertinoColors.black,
-                          fontWeight: FontWeight.w700),
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: Container(
+        padding: const EdgeInsets.all(15),
+        width: double.infinity,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    hospitalDrugstore.name,
+                    style: const TextStyle(
+                      color: CupertinoColors.black,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 20,
                     ),
-                    const SizedBox(
-                      height: 10,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    hospitalDrugstore.description.isEmpty
+                        ? "Chưa cập nhật mô tả"
+                        : hospitalDrugstore.description,
+                    style: TextStyle(
+                      color: Color(MyColors.grey02),
+                      fontWeight: FontWeight.w500,
                     ),
-                    Text(
-                      hospitalDrugstore.address,
-                      style: TextStyle(
-                        color: Color(MyColors.grey02),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              // Image(
-              //   image: AssetImage('assets/doctor01.jpeg'),
-              //   width: 100,
-              // )
-            ],
-          ),
+            ),
+            // Image(
+            //   image: AssetImage('assets/doctor01.jpeg'),
+            //   width: 100,
+            // )
+          ],
         ),
       ),
     );
