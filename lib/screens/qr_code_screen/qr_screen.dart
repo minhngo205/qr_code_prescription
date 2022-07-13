@@ -71,10 +71,10 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
               ),
               Column(
                 children: [
-                  const Text(
-                    "Ngô Hoàng Minh",
+                  Text(
+                    args.fullName,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: CupertinoColors.black,
                       fontWeight: FontWeight.bold,
                       fontSize: 22,
@@ -187,5 +187,6 @@ class ImageButton extends StatelessWidget {
 class QRScreenArguments {
   final int id;
   final String data;
-  QRScreenArguments(this.id, this.data);
+  final String fullName;
+  QRScreenArguments(this.id, this.data, this.fullName);
 }

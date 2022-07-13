@@ -197,12 +197,26 @@ class _UserInfoPageState extends State<UserInfoPage> {
                                 const SizedBox(
                                   height: 8,
                                 ),
-                                const Text(
-                                  "Đây là thông tin y tế của bạn",
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.blueGrey,
-                                  ),
+                                Row(
+                                  children: [
+                                    const Text(
+                                      "Địa chỉ: ",
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.blueGrey,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      userInfo.address.isEmpty
+                                          ? "Chưa cập nhật địa chỉ"
+                                          : userInfo.address,
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.blueGrey,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             )

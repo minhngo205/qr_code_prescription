@@ -28,7 +28,7 @@ class CardSection extends StatelessWidget {
       alignment: Alignment.topLeft,
       child: Container(
         margin: const EdgeInsets.only(right: 15.0),
-        width: 240,
+        width: 280,
         decoration: const BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(10.0)),
           shape: BoxShape.rectangle,

@@ -99,7 +99,8 @@ class _MainScreenState extends State<MainScreen> {
               child: FloatingActionButton(
                 child: const Icon(CupertinoIcons.qrcode_viewfinder),
                 onPressed: () {
-                  Navigator.pushNamed(context, IdentificarionScreen.routeName);
+                  Navigator.pushNamed(context, IdentificarionScreen.routeName,
+                      arguments: IdentificarionScreenArgument(userInfo.name));
                 },
               ),
             ),

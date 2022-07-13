@@ -4,7 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:qr_code_prescription/screens/main/home_screen/recent_pres.dart';
 import 'package:qr_code_prescription/screens/main/home_screen/welcome_card.dart';
 import 'package:qr_code_prescription/screens/list_screen/list_screen.dart';
-import 'package:qr_code_prescription/screens/medical_info/user_info.dart';
+import 'package:qr_code_prescription/screens/medical_info/user_info_screen.dart';
 import 'package:qr_code_prescription/model/dtos/user_info.dart';
 import 'package:qr_code_prescription/utils/constants.dart';
 

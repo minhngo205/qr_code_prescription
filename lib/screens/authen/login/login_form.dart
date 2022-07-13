@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:intl_phone_field/country_picker_dialog.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
-import 'package:qr_code_prescription/components/custom_surfix_icon.dart';
 import 'package:qr_code_prescription/components/default_button.dart';
 import 'package:qr_code_prescription/components/form_error.dart';
 import 'package:qr_code_prescription/screens/main/main_screen.dart';
@@ -161,6 +160,7 @@ class _LoginFormState extends State<LoginForm> {
           } else {
             removeError(error: kInvalidPhoneNoError);
           }
+          return null;
         },
         decoration: InputDecoration(
           hintText: "Số điện thoại",
@@ -198,6 +198,7 @@ class _LoginFormState extends State<LoginForm> {
           } else {
             removeError(error: kPassNullError);
           }
+          return null;
           /* else if (value.length < 8) {
               addError(error: kShortPassError);
               return "";

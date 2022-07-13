@@ -38,6 +38,7 @@ class _EditInfoScreenState extends State<EditInfoScreen> {
   late var firstDOB;
   late var firstID;
   late var firstSocial;
+  late var firstAddress;
 
   // final TextEditingController _nameController = TextEditingController();
   // final TextEditingController _IDController = TextEditingController();
@@ -51,6 +52,7 @@ class _EditInfoScreenState extends State<EditInfoScreen> {
     firstDOB = userInfo.dob;
     firstID = userInfo.identifyNumber;
     firstSocial = userInfo.socialInsurance;
+    firstAddress = userInfo.address;
     userInfo.gender
         ? genders[0].isSelected = true
         : genders[1].isSelected = true;
@@ -61,7 +63,8 @@ class _EditInfoScreenState extends State<EditInfoScreen> {
         firstGender != userInfo.gender ||
         firstDOB != userInfo.dob ||
         firstID != userInfo.identifyNumber ||
-        firstSocial != userInfo.socialInsurance;
+        firstSocial != userInfo.socialInsurance ||
+        firstAddress != userInfo.address;
   }
 
   loadData() async {
@@ -163,6 +166,16 @@ class _EditInfoScreenState extends State<EditInfoScreen> {
                             buidDOBFormField(),
                             SizedBox(height: getProportionateScreenHeight(15)),
                             const Text(
+                              'Địa chỉ thường trú',
+                              style: TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black),
+                            ),
+                            SizedBox(height: getProportionateScreenHeight(15)),
+                            buildAddressFormField(),
+                            SizedBox(height: getProportionateScreenHeight(15)),
+                            const Text(
                               'CMND/CCCD',
                               style: TextStyle(
                                   fontSize: 16.0,
@@ -170,7 +183,7 @@ class _EditInfoScreenState extends State<EditInfoScreen> {
                                   color: Colors.black),
                             ),
                             SizedBox(height: getProportionateScreenHeight(15)),
-                            bulidIDFormField(),
+                            buildIDFormField(),
                             SizedBox(height: getProportionateScreenHeight(15)),
                             const Text(
                               'Bảo hiểm xã hội',
@@ -180,7 +193,7 @@ class _EditInfoScreenState extends State<EditInfoScreen> {
                                   color: Colors.black),
                             ),
                             SizedBox(height: getProportionateScreenHeight(15)),
-                            bulidSocialFormField(),
+                            buildSocialFormField(),
                             SizedBox(height: getProportionateScreenHeight(30)),
                             //                   FormError(errors: errors),
                             // SizedBox(height: getProportionateScreenHeight(40)),
@@ -375,7 +388,7 @@ class _EditInfoScreenState extends State<EditInfoScreen> {
     );
   }
 
-  Widget bulidIDFormField() {
+  Widget buildIDFormField() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5.0),
       child: TextFormField(
@@ -408,7 +421,7 @@ class _EditInfoScreenState extends State<EditInfoScreen> {
     );
   }
 
-  bulidSocialFormField() {
+  buildSocialFormField() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5.0),
       child: TextFormField(
@@ -428,6 +441,39 @@ class _EditInfoScreenState extends State<EditInfoScreen> {
         },
         decoration: InputDecoration(
           hintText: "Bảo hiểm xã hội",
+          suffixIcon: const Icon(CupertinoIcons.creditcard),
+          enabledBorder: outlineInputBorder,
+          focusedBorder: outlineInputBorderFocus,
+          errorBorder: outlineInputBorder,
+          focusedErrorBorder: outlineInputBorderFocus,
+          fillColor: Colors.grey[200],
+          filled: true,
+        ),
+        style: const TextStyle(fontSize: 18.0),
+      ),
+    );
+  }
+
+  buildAddressFormField() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+      child: TextFormField(
+        initialValue: userInfo.address,
+        keyboardType: TextInputType.text,
+        textInputAction: TextInputAction.next,
+        onSaved: (address) {
+          setState(() {
+            userInfo.address = address!;
+          });
+        },
+        validator: (value) {
+          if (value!.isEmpty) {
+            return "Trường này không được để trống";
+          }
+          return null;
+        },
+        decoration: InputDecoration(
+          hintText: "Địa chỉ thường trú",
           suffixIcon: const Icon(CupertinoIcons.creditcard),
           enabledBorder: outlineInputBorder,
           focusedBorder: outlineInputBorderFocus,

@@ -9,6 +9,7 @@ class UserInfo {
     required this.medicalInfo,
     required this.name,
     required this.gender,
+    required this.address,
     required this.identifyNumber,
     required this.socialInsurance,
     required this.createdAt,
@@ -21,6 +22,7 @@ class UserInfo {
   MedicalInfo medicalInfo;
   String name;
   bool gender;
+  String address;
   String identifyNumber;
   String socialInsurance;
   DateTime createdAt;
@@ -33,6 +35,7 @@ class UserInfo {
         medicalInfo: MedicalInfo.fromJson(json["medical_info"]),
         name: json["name"],
         gender: json["gender"],
+        address: json["address"],
         identifyNumber: json["identify_number"],
         socialInsurance: json["social_insurance"],
         createdAt: DateTime.parse(json["created_at"]),
@@ -47,6 +50,7 @@ class UserInfo {
         "medical_info": medicalInfo.toJson(),
         "name": name,
         "gender": gender,
+        "address": address,
         "identify_number": identifyNumber,
         "social_insurance": socialInsurance,
         "created_at": createdAt.toIso8601String(),

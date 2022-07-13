@@ -1,4 +1,3 @@
-import 'package:qr_code_prescription/model/dtos/prescription.dart';
 import 'package:qr_code_prescription/model/dtos/prescription_item.dart';
 
 import 'base/pagination_link.dart';

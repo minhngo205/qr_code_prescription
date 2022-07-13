@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
+// ignore: must_be_immutable
 class Loading extends StatelessWidget {
   bool haveText = true;
   Loading({Key? key, required this.haveText}) : super(key: key);

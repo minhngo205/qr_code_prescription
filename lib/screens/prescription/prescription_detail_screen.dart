@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -5,12 +6,12 @@ import 'package:qr_code_prescription/components/card_items.dart';
 import 'package:qr_code_prescription/components/card_main.dart';
 import 'package:qr_code_prescription/components/card_section.dart';
 import 'package:qr_code_prescription/components/custom_clipper.dart';
+import 'package:qr_code_prescription/screens/list_screen/detail_hospital_drugstore/hospital_drugstore_detail.dart';
 import 'package:qr_code_prescription/screens/loading/loading_screen.dart';
 import 'package:qr_code_prescription/screens/authen/login/login_screen.dart';
 import 'package:qr_code_prescription/screens/qr_code_screen/qr_screen.dart';
 import 'package:qr_code_prescription/model/dtos/medicine_item.dart';
 import 'package:qr_code_prescription/model/dtos/prescription.dart';
-import 'package:qr_code_prescription/model/dtos/user_info.dart';
 import 'package:qr_code_prescription/services/storage/storage_service.dart';
 import 'package:qr_code_prescription/services/user_service/user_service.dart';
 import 'package:qr_code_prescription/utils/constants.dart';
@@ -18,7 +19,8 @@ import 'package:qr_code_prescription/utils/size_config.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 class PrescriptionDetail extends StatefulWidget {
-  const PrescriptionDetail({Key? key, required this.prescriptionID}) : super(key: key);
+  const PrescriptionDetail({Key? key, required this.prescriptionID})
+      : super(key: key);
   static String routeName = "/pres_detail";
   final int prescriptionID;
 
@@ -80,7 +82,6 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
 
   @override
   Widget build(BuildContext context) {
-
     getMedicineImage(String usage) {
       if (usage == "Uống") {
         return const AssetImage('assets/icons/capsule.png');
@@ -171,8 +172,15 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
         ).show();
       } else {
         Navigator.of(context).pop();
-        Navigator.pushNamed(context, QRCodeScreen.routeName,
-            arguments: QRScreenArguments(widget.prescriptionID, presToken));
+        Navigator.pushNamed(
+          context,
+          QRCodeScreen.routeName,
+          arguments: QRScreenArguments(
+            widget.prescriptionID,
+            presToken,
+            prescription.patient.name,
+          ),
+        );
       }
     }
 
@@ -263,13 +271,23 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: <Widget>[
                                 // Rest Active Legend
-                                Text(
-                                  prescription.doctor.hospital.name
-                                      .toString(),
-                                  style: const TextStyle(
-                                    color: CupertinoColors.black,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      HospitalDrugstoreDetail.routeName,
+                                      arguments:
+                                          HospitalDrugstoreDetailArguments(
+                                              prescription.doctor.hospital),
+                                    );
+                                  },
+                                  child: Text(
+                                    prescription.doctor.hospital.name,
+                                    style: const TextStyle(
+                                      color: CupertinoColors.black,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(
@@ -277,14 +295,46 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
                                 ),
                                 Row(
                                   children: [
-                                    Text(
-                                      "Dr. " +
-                                          prescription.doctor.name
-                                              .toString(),
-                                      style: const TextStyle(
-                                        color: CupertinoColors.black,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.normal,
+                                    Container(
+                                      width: 50,
+                                      height: 50,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(50),
+                                        image: DecorationImage(
+                                            image: CachedNetworkImageProvider(
+                                                prescription.doctor.avatar),
+                                            fit: BoxFit.cover),
+                                        border: Border.all(
+                                          color: prescription
+                                                  .doctor.user.isActive
+                                              ? CupertinoColors.activeGreen
+                                              : CupertinoColors.destructiveRed,
+                                          width: 1,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "Dr. " + prescription.doctor.name,
+                                            style: const TextStyle(
+                                              color: CupertinoColors.black,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Text(
+                                            prescription.doctor.department,
+                                            // style: TextStyle(
+                                            //     color: this.isSelected!
+                                            //         ? Colors.white
+                                            //         : AppColors.MAIN_COLOR),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ],
@@ -380,7 +430,7 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
                           decoration: const BoxDecoration(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10.0))),
-                          height: 180,
+                          height: 220,
                           child: ListView(
                             scrollDirection: Axis.horizontal,
                             children: <Widget>[
@@ -395,8 +445,8 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
                                       : "${medicineitem.amount} liều",
                                   image: getMedicineImage(
                                       medicineitem.medicine.usage),
-                                  isDone: getMedicineStatus(
-                                      prescription.status),
+                                  isDone:
+                                      getMedicineStatus(prescription.status),
                                   instruction: medicineitem.doctorNote,
                                 ),
                             ],
@@ -445,7 +495,8 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
                                   ),
                                 ),
                                 Text(
-                                  calculateAge(prescription.patient.dob).toString(),
+                                  calculateAge(prescription.patient.dob)
+                                      .toString(),
                                   style: const TextStyle(
                                     color: CupertinoColors.black,
                                     fontSize: 16,
@@ -489,6 +540,30 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
                                 ),
                               ],
                             ),
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                const Text(
+                                  "Tiền sử bệnh: ",
+                                  style: TextStyle(
+                                    color: CupertinoColors.black,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  prescription.patient.medicalInfo
+                                          .medicalHistory.isEmpty
+                                      ? "Chưa có tiền sử bệnh"
+                                      : prescription
+                                          .patient.medicalInfo.medicalHistory,
+                                  style: const TextStyle(
+                                    color: CupertinoColors.black,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
 
@@ -508,8 +583,8 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
                                     image: const AssetImage(
                                         'assets/icons/high-temperature.png'),
                                     title: "Thân nhiệt",
-                                    value: prescription.medicalInfo
-                                        .bodyTemperature
+                                    value: prescription
+                                        .medicalInfo.bodyTemperature
                                         .toString(),
                                     unit: "°C",
                                     color: CupertinoColors.white,
@@ -518,12 +593,12 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
                                     image: const AssetImage(
                                         'assets/icons/hypertension.png'),
                                     title: "Huyết áp",
-                                    value: prescription.medicalInfo
-                                            .systolicBloodPressure
+                                    value: prescription
+                                            .medicalInfo.systolicBloodPressure
                                             .toString() +
                                         " / " +
-                                        prescription.medicalInfo
-                                            .diastolicBloodPressure
+                                        prescription
+                                            .medicalInfo.diastolicBloodPressure
                                             .toString(),
                                     unit: "mmHg",
                                     color: CupertinoColors.white,
@@ -561,35 +636,63 @@ class _PrescriptionDetailState extends State<PrescriptionDetail> {
                         const SizedBox(height: 50),
 
                         // Scheduled Activities
-                        const Text(
-                          "TIỀN SỬ BỆNH",
-                          style: TextStyle(
-                              color: kTextColor,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold),
-                        ),
-
-                        const SizedBox(height: 20),
-
                         ListView(
                           scrollDirection: Axis.vertical,
                           physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
                           children: <Widget>[
-                            prescription.medicalInfo.medicalHistory.isEmpty
+                            const Text(
+                              "DẶN DÒ CỦA BÁC SỸ",
+                              style: TextStyle(
+                                  color: kTextColor,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 20),
+                            prescription.doctorNote.isEmpty
                                 ? CardItems(
                                     image:
                                         Image.asset('assets/icons/cancel.png'),
-                                    title: "Chưa có tiền sử bệnh",
+                                    title: "Bác sỹ không có dặn dò gì thêm",
                                     color: kPrimaryColor,
                                   )
                                 : CardItems(
                                     image:
                                         Image.asset('assets/icons/checked.png'),
-                                    title: prescription.medicalInfo
-                                        .medicalHistory,
+                                    title: prescription.doctorNote,
                                     color: CupertinoColors.activeGreen,
+                                  ),
+                            const SizedBox(height: 20),
+                            Visibility(
+                              visible: prescription.status == "closed",
+                              child: const Text(
+                                "DẶN DÒ CỦA DƯỢC SỸ",
+                                style: TextStyle(
+                                    color: kTextColor,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            prescription.pharmacistNote.isEmpty
+                                ? Visibility(
+                                    visible: prescription.status == "closed",
+                                    child: CardItems(
+                                      image: Image.asset(
+                                          'assets/icons/cancel.png'),
+                                      title: "Dược sỹ không có dặn dò gì thêm",
+                                      color: kPrimaryColor,
+                                    ),
                                   )
+                                : Visibility(
+                                    visible: prescription.status == "closed",
+                                    child: CardItems(
+                                      image: Image.asset(
+                                          'assets/icons/checked.png'),
+                                      title: prescription.pharmacistNote,
+                                      color: CupertinoColors.activeGreen,
+                                    ),
+                                  ),
                           ],
                         ),
                       ],

@@ -7,8 +7,13 @@ import 'package:qr_code_prescription/model/dtos/hospital_drugstore.dart';
 class HospitalDrugstoreCard extends StatelessWidget {
   final HospitalDrugstore hospitalDrugstore;
 
-  const HospitalDrugstoreCard({Key? key, required this.hospitalDrugstore})
+  HospitalDrugstoreCard({Key? key, required this.hospitalDrugstore})
       : super(key: key);
+
+  final Map trailing = {
+    'hospital': const Icon(Icons.medical_services),
+    'drugstore': const Icon(CupertinoIcons.lab_flask_solid)
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -26,9 +31,7 @@ class HospitalDrugstoreCard extends StatelessWidget {
           children: [
             ListTile(
               title: Text(hospitalDrugstore.name),
-              trailing: hospitalDrugstore.user.role == "hospital"
-                  ? const Icon(Icons.medical_services)
-                  : const Icon(CupertinoIcons.lab_flask_solid),
+              trailing: trailing[hospitalDrugstore.user.role],
             ),
             SizedBox(
               height: 200.0,

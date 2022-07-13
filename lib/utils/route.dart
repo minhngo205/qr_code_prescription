@@ -7,8 +7,7 @@ import 'package:qr_code_prescription/screens/list_screen/detail_hospital_drugsto
 import 'package:qr_code_prescription/screens/authen/login/login_screen.dart';
 import 'package:qr_code_prescription/screens/main/main_screen.dart';
 import 'package:qr_code_prescription/screens/list_screen/list_screen.dart';
-import 'package:qr_code_prescription/screens/medical_info/user_info.dart';
-import 'package:qr_code_prescription/screens/prescription/prescription_detail_screen.dart';
+import 'package:qr_code_prescription/screens/medical_info/user_info_screen.dart';
 import 'package:qr_code_prescription/screens/authen/register/register_screen.dart';
 import 'package:qr_code_prescription/screens/qr_code_screen/identification_qr.dart';
 import 'package:qr_code_prescription/screens/qr_code_screen/qr_screen.dart';

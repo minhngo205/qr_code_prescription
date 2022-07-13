@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
-import 'package:qr_code_prescription/model/dtos/user_info.dart';
 import 'package:qr_code_prescription/services/storage/storage_service.dart';
 import 'package:qr_code_prescription/utils/constants.dart';
 import 'dart:convert';

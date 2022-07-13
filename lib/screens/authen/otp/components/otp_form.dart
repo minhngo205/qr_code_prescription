@@ -193,14 +193,14 @@ class _OtpFormState extends State<OtpForm> {
 }
 
 final otpInputDecoration = InputDecoration(
-    contentPadding:
-        EdgeInsets.symmetric(vertical: getProportionateScreenWidth(15)),
-    enabledBorder: outlineInputBorder,
-    focusedBorder: outlineInputBorderFocus,
-    errorBorder: outlineInputBorderFocus,
-    fillColor: Colors.grey[200],
-    filled: true,
-    hintText: "0");
+  contentPadding:
+      EdgeInsets.symmetric(vertical: getProportionateScreenWidth(15)),
+  enabledBorder: outlineInputBorder,
+  focusedBorder: outlineInputBorderFocus,
+  errorBorder: outlineInputBorderFocus,
+  fillColor: Colors.grey[200],
+  filled: true,
+);
 
 OutlineInputBorder outlineInputBorder = OutlineInputBorder(
   borderRadius: BorderRadius.circular(12),

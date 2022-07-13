@@ -61,6 +61,9 @@ class _IdentificarionScreenState extends State<IdentificarionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)!.settings.arguments
+        as IdentificarionScreenArgument;
+
     return isLoading
         ? Loading(haveText: false)
         : Scaffold(
@@ -118,11 +121,11 @@ class _IdentificarionScreenState extends State<IdentificarionScreen> {
                       ),
                     ),
                     Column(
-                      children: const [
+                      children: [
                         Text(
-                          "Ngô Hoàng Minh",
+                          args.fullName,
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: CupertinoColors.black,
                             fontWeight: FontWeight.bold,
                             fontSize: 22,
@@ -230,4 +233,9 @@ class ImageButton extends StatelessWidget {
       ),
     );
   }
+}
+
+class IdentificarionScreenArgument {
+  final String fullName;
+  IdentificarionScreenArgument(this.fullName);
 }

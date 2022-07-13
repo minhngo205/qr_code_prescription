@@ -209,6 +209,7 @@ class UserRepository {
         'dob': apiDateFormat(userInfo.dob),
         'identify_number': userInfo.identifyNumber,
         'social_insurance': userInfo.socialInsurance,
+        'address': userInfo.address,
       },
     );
     if (response.statusCode == 200) {

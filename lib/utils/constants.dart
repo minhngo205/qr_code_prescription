@@ -7,7 +7,6 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import 'size_config.dart';
 
 const baseURL = "https://yshuynh.pythonanywhere.com/api";
-const googleMapAPIKey = "AIzaSyBr2Bt331Q26hFa-ghmULCXVVef9UWXRas";
 const kPrimaryColor = Color(0xFFFF7643);
 const kPrimaryLightColor = Color(0xFFFFECDF);
 const kPrimaryGradientColor = LinearGradient(

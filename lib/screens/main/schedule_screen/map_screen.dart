@@ -243,8 +243,7 @@ class _MapScreenState extends State<MapScreen> {
       context: context,
       builder: (_) {
         return Dialog(
-          insetPadding:
-              const EdgeInsets.symmetric(horizontal: 10, vertical: 250),
+          insetPadding: const EdgeInsets.symmetric(vertical: 250),
           elevation: 10,
           backgroundColor: Colors.transparent,
           child: Container(

@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:qr_code_prescription/components/default_button.dart';
 import 'package:qr_code_prescription/screens/loading/loading_screen.dart';
 import 'package:qr_code_prescription/model/dtos/hospital_drugstore.dart';
 import 'package:qr_code_prescription/services/public_service/public_service.dart';
@@ -26,6 +27,11 @@ class _HospitalDrugstoreDetailState extends State<HospitalDrugstoreDetail> {
 
   late BitmapDescriptor hospitalIcon;
   late BitmapDescriptor pharmacyIcon;
+
+  final Map titles = {
+    'hospital': const Text('Bệnh viện'),
+    'drugstore': const Text('Nhà thuốc')
+  };
 
   refreshData(int detailID, String role) async {
     HospitalDrugstore? detail =
@@ -94,9 +100,7 @@ class _HospitalDrugstoreDetailState extends State<HospitalDrugstoreDetail> {
               slivers: [
                 SliverAppBar(
                   pinned: true,
-                  title: hospitalDrugstore.user.role == "hospital"
-                      ? const Text('Bệnh viện')
-                      : const Text('Nhà thuốc'),
+                  title: titles[hospitalDrugstore.user.role],
                   backgroundColor: CupertinoColors.activeBlue,
                   expandedHeight: 200,
                   flexibleSpace: FlexibleSpaceBar(
@@ -124,6 +128,7 @@ class DetailBody extends StatelessWidget {
   final HospitalDrugstore info;
   final BitmapDescriptor hospital;
   final BitmapDescriptor drugstore;
+
   const DetailBody({
     Key? key,
     required this.info,
@@ -149,7 +154,11 @@ class DetailBody extends StatelessWidget {
           ),
           Text(
             "Địa chỉ",
-            style: kTitleStyle,
+            style: TextStyle(
+              color: Color(MyColors.header01),
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
           ),
           const SizedBox(
             height: 15,
@@ -157,17 +166,21 @@ class DetailBody extends StatelessWidget {
           Text(
             info.address,
             style: const TextStyle(
-              color: CupertinoColors.black,
-              fontWeight: FontWeight.w500,
-              height: 1.5,
-            ),
+                color: CupertinoColors.black,
+                fontWeight: FontWeight.w500,
+                height: 1.5,
+                fontSize: 15),
           ),
           const SizedBox(
             height: 30,
           ),
           Text(
             "Số điện thoại",
-            style: kTitleStyle,
+            style: TextStyle(
+              color: Color(MyColors.header01),
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
           ),
           const SizedBox(
             height: 15,
@@ -178,6 +191,7 @@ class DetailBody extends StatelessWidget {
               color: CupertinoColors.black,
               fontWeight: FontWeight.w500,
               height: 1.5,
+              fontSize: 15,
             ),
           ),
           const SizedBox(
@@ -185,7 +199,11 @@ class DetailBody extends StatelessWidget {
           ),
           Text(
             "Email",
-            style: kTitleStyle,
+            style: TextStyle(
+              color: Color(MyColors.header01),
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
           ),
           const SizedBox(
             height: 15,
@@ -196,6 +214,7 @@ class DetailBody extends StatelessWidget {
               color: CupertinoColors.black,
               fontWeight: FontWeight.w500,
               height: 1.5,
+              fontSize: 15,
             ),
           ),
           const SizedBox(
@@ -203,7 +222,11 @@ class DetailBody extends StatelessWidget {
           ),
           Text(
             "Trang web",
-            style: kTitleStyle,
+            style: TextStyle(
+              color: Color(MyColors.header01),
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
           ),
           const SizedBox(
             height: 15,
@@ -214,6 +237,7 @@ class DetailBody extends StatelessWidget {
               color: CupertinoColors.black,
               fontWeight: FontWeight.w500,
               height: 1.5,
+              fontSize: 15,
             ),
           ),
           const SizedBox(
@@ -221,7 +245,11 @@ class DetailBody extends StatelessWidget {
           ),
           Text(
             'Vị trí',
-            style: kTitleStyle,
+            style: TextStyle(
+              color: Color(MyColors.header01),
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
           ),
           const SizedBox(
             height: 25,
@@ -234,14 +262,11 @@ class DetailBody extends StatelessWidget {
           const SizedBox(
             height: 25,
           ),
-          ElevatedButton(
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all<Color>(
-                Color(MyColors.primary),
-              ),
-            ),
-            child: const Text('Thông tin chi tiết'),
-            onPressed: () => {},
+          DefaultButton(
+            backgroundColor: CupertinoColors.activeBlue,
+            textColor: CupertinoColors.white,
+            text: 'Thông tin chi tiết',
+            press: () => {},
           )
         ],
       ),
